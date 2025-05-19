@@ -1,0 +1,38 @@
+name: Java Linting
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Run Checkstyle
+        run: |
+          wget -O checkstyle.jar https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.12.2/checkstyle-10.12.2-all.jar
+          java -jar checkstyle.jar -c .rulesets/checkstyle.xml app/
+
+      - name: Run PMD
+        run: |
+          wget https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.12.0/pmd-dist-7.12.0-bin.zip
+          unzip pmd-dist-7.12.0-bin.zip
+          ./pmd-bin-7.12.0/bin/pmd check -d app -R .rulesets/pmd.xml -f text --no-progress --no-cache
+          if [ $? -ne 0 ]; then
+            echo -e "\033[0;31mPMD found issues! Check the message above!"
+            exit 1
+          fi
+          echo -e "\033[0;32mSuccessfull commit!"
+          exit 0

@@ -1,0 +1,8 @@
+.DS_Store
+.idea
+.gradle
+local.properties
+build
+app/src/main/assets/env
+.vscode
+app/src/main/res/raw/
