@@ -8,7 +8,6 @@ import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.ReservationService;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -100,15 +99,13 @@ public class TimetableFragment extends Fragment {
                 Bundle args = new Bundle();
                 args.putString("className", item.getName());
                 args.putString("activityType", item.getTypeName());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    LocalDateTime start = item.getStartDate();
-                    LocalDateTime end = item.getEndDate();
-                    DateTimeFormatter dateFormatter = DateTimeFormatter
-                            .ofPattern("dd/MM/yyyy HH:mm");
-                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                    String result = dateFormatter.format(start) + " - " + timeFormatter.format(end);
-                    args.putString("classHours", result);
-                }
+                LocalDateTime start = item.getStartDate();
+                LocalDateTime end = item.getEndDate();
+                DateTimeFormatter dateFormatter = DateTimeFormatter
+                        .ofPattern("dd/MM/yyyy HH:mm");
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+                String result = dateFormatter.format(start) + " - " + timeFormatter.format(end);
+                args.putString("classHours", result);
 
                 Teacher[] teachers = item.getTeachers();
                 StringBuilder builder1 = new StringBuilder();
@@ -166,11 +163,9 @@ public class TimetableFragment extends Fragment {
 
     public void setReservations(List<Reservation> reservations, View view) {
         for (Reservation r : reservations) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalDate date = r.getStartDate().atZone(ZoneId.systemDefault())
-                        .toLocalDate();
-                reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
-            }
+            LocalDate date = r.getStartDate().atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
         loadData(view);
     }
