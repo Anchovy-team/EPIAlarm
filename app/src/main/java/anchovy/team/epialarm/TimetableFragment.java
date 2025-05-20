@@ -19,8 +19,10 @@ import androidx.fragment.app.Fragment;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,7 +32,6 @@ public class TimetableFragment extends Fragment {
     Map<LocalDate, List<Reservation>> reservationsGrouped;
     ZeusApiClient clientService = new ZeusApiClient();
     ReservationService reservationService;
-
     List<Reservation> reservations;
 
     @Override
@@ -46,43 +47,32 @@ public class TimetableFragment extends Fragment {
                 Context.MODE_PRIVATE);
         String token = prefs.getString("user_token", null);
 
-
         try {
-            clientService.authenticate(token).thenAccept(token1 -> {
-                System.out.println("Authenticated with token: " + token1);
-            }).join();
+            clientService.authenticate(token).thenAccept(token1 -> {}).join();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         reservationService = new ReservationService(clientService);
-
         reservationsGrouped = new TreeMap<>();
-
         List<Long> groups = new ArrayList<>();
         groups.add((long) 633);
-        // LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
-        // LocalDateTime onewWeekFut = LocalDateTime.now().plusWeeks(1);
-        LocalDateTime oneWeekAgo = LocalDateTime.now();
-        LocalDateTime onewWeekFut = LocalDateTime.now().plusWeeks(2);
-        synchronized (reservationService) {
-            try {
-                reservationService.getReservationsByFilter(groups,
-                        new ArrayList<>(), new ArrayList<>(),
-                        oneWeekAgo, onewWeekFut).thenAccept(reservations1 -> {
-                            reservations = reservations1;
-                            System.out.println("Update");
-                            //reservationsGrouped = new TreeMap<>();
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
 
-                        }
-                );
-                reservationService.wait(500);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
 
-        setReservations(reservations, view);
+        reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
+                today, oneWeekForward).thenAccept(reservations1 -> {
+            reservations = reservations1;
+            requireActivity().runOnUiThread(() -> {
+                setReservations(reservations, view);
+            });
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
+
         ListView listView = view.findViewById(R.id.LessonsListView);
         listView.setClickable(true);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -110,7 +100,7 @@ public class TimetableFragment extends Fragment {
                 Teacher[] teachers = item.getTeachers();
                 StringBuilder builder1 = new StringBuilder();
                 for (int i = 0; i < teachers.length; i++) {
-                    builder1.append(teachers[i].getName());
+                    builder1.append(teachers[i].getFirstname()).append(" ").append(teachers[i].getName());
                     if (i < teachers.length - 1) {
                         builder1.append(", ");
                     }
@@ -148,8 +138,6 @@ public class TimetableFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        System.out.println("Update");
-        //authService.loadAccount(this);
     }
 
     public void loadData(View view) {
@@ -162,9 +150,13 @@ public class TimetableFragment extends Fragment {
     }
 
     public void setReservations(List<Reservation> reservations, View view) {
+        if (reservations == null) return;
         for (Reservation r : reservations) {
-            LocalDate date = r.getStartDate().atZone(ZoneId.systemDefault())
-                    .toLocalDate();
+            ZoneId parisZone = ZoneId.of("Europe/Paris");
+            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone);
+            LocalDate date = parisDateTime.toLocalDate();
+            r.setStartDate(parisDateTime.toLocalDateTime());
+            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone).toLocalDateTime());
             reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
         loadData(view);

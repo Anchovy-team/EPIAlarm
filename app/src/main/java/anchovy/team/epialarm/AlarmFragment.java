@@ -75,7 +75,6 @@ public class AlarmFragment extends Fragment {
             ZonedDateTime notifyTimeParis = eventTimeParis.minusMinutes(advanceMinutes);
             ZonedDateTime nowParis = ZonedDateTime.now(parisZone);
             long delayMillis = Duration.between(nowParis, notifyTimeParis).toMillis();
-            System.out.println(delayMillis);
             AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(
                     ALARM_SERVICE);
             alarmManager.cancel(pendingIntent);
