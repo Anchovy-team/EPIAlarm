@@ -28,8 +28,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        System.out.println("on receive triggered");
-
         final String action = intent.getStringExtra("action");
         final String alarmOrNotification = intent.getStringExtra("alarmOrNotification");
         className = intent.getStringExtra("className");

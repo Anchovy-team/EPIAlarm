@@ -35,16 +35,16 @@ public class CustomBaseAdapter extends BaseAdapter {
         for (Map.Entry<LocalDate, List<Reservation>> entry : new TreeMap<>(reservationsGrouped)
                 .entrySet()) {
             displayList.add(new DateHeaderItem(entry.getKey()));
-            /*for (Reservation r : entry.getValue()) {
-                displayList.add(new ReservationItem(r));
-            }*/
-            entry.getValue().stream()
-                    //.sorted(Comparator.comparing(Reservation::getStartDate))
-                    //.forEach(r -> displayList.add(new ReservationItem(r)));
+            /*entry.getValue().stream()
                     .sorted(Comparator.comparing(r -> r.getStartDate().plusHours(2)))
                     .forEach(r -> {
                         r.setStartDate(r.getStartDate().plusHours(2));
                         r.setEndDate(r.getEndDate().plusHours(2));
+                        displayList.add(new ReservationItem(r));
+                    });*/
+            entry.getValue().stream()
+                    .sorted(Comparator.comparing(Reservation::getStartDate))
+                    .forEach(r -> {
                         displayList.add(new ReservationItem(r));
                     });
         }
