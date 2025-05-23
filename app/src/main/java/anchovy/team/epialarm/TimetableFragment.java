@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -56,7 +55,9 @@ public class TimetableFragment extends Fragment {
         reservationService = new ReservationService(clientService);
         reservationsGrouped = new TreeMap<>();
         List<Long> groups = new ArrayList<>();
-        groups.add((long) 633);
+        long groupId = prefs.getLong("groupId", 633);
+        //System.out.println("received groupId: " + groupId);
+        groups.add(groupId);
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
 
@@ -64,14 +65,14 @@ public class TimetableFragment extends Fragment {
 
         reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
                 today, oneWeekForward).thenAccept(reservations1 -> {
-            reservations = reservations1;
-            requireActivity().runOnUiThread(() -> {
-                setReservations(reservations, view);
-            });
-        }).exceptionally(ex -> {
-            ex.printStackTrace();
-            return null;
-        });
+                    reservations = reservations1;
+                    requireActivity().runOnUiThread(() -> {
+                        setReservations(reservations, view);
+                    });
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
 
         ListView listView = view.findViewById(R.id.LessonsListView);
         listView.setClickable(true);
@@ -100,7 +101,8 @@ public class TimetableFragment extends Fragment {
                 Teacher[] teachers = item.getTeachers();
                 StringBuilder builder1 = new StringBuilder();
                 for (int i = 0; i < teachers.length; i++) {
-                    builder1.append(teachers[i].getFirstname()).append(" ").append(teachers[i].getName());
+                    builder1.append(teachers[i].getFirstname()).append(" ").append(teachers[i]
+                            .getName());
                     if (i < teachers.length - 1) {
                         builder1.append(", ");
                     }
@@ -150,13 +152,17 @@ public class TimetableFragment extends Fragment {
     }
 
     public void setReservations(List<Reservation> reservations, View view) {
-        if (reservations == null) return;
+        if (reservations == null) {
+            return;
+        }
         for (Reservation r : reservations) {
             ZoneId parisZone = ZoneId.of("Europe/Paris");
-            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone);
+            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();
             r.setStartDate(parisDateTime.toLocalDateTime());
-            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone).toLocalDateTime());
+            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(parisZone).toLocalDateTime());
             reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
         loadData(view);
