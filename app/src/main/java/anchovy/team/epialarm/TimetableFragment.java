@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import java.time.LocalDate;
@@ -42,9 +43,22 @@ public class TimetableFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+
         SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
         String token = prefs.getString("user_token", null);
+        long groupId = prefs.getLong("groupId", -1);
+
+        if (token == null) {
+            Toast.makeText(getContext(), "Nothing to see here, you are not authorized",
+                    Toast.LENGTH_SHORT).show();
+            return view;
+        } else if (groupId == -1) {
+            Toast.makeText(getContext(), "You have to choose a group!", Toast.LENGTH_SHORT)
+                    .show();
+            return view;
+        }
 
         try {
             clientService.authenticate(token).thenAccept(token1 -> {}).join();
@@ -55,13 +69,9 @@ public class TimetableFragment extends Fragment {
         reservationService = new ReservationService(clientService);
         reservationsGrouped = new TreeMap<>();
         List<Long> groups = new ArrayList<>();
-        long groupId = prefs.getLong("groupId", 633);
-        //System.out.println("received groupId: " + groupId);
         groups.add(groupId);
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
-
-        View view = inflater.inflate(R.layout.fragment_timetable, container, false);
 
         reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
                 today, oneWeekForward).thenAccept(reservations1 -> {
