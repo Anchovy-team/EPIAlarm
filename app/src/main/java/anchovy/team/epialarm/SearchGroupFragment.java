@@ -76,8 +76,9 @@ public class SearchGroupFragment extends DialogFragment {
                             int groupId = selectedGroup.getId();
                             //System.out.println("send group Id: " + groupId);
                             SharedPreferences.Editor editor = prefs.edit();
-                            editor.putLong("groupId", groupId);
-                            editor.apply();
+                            editor.putLong("groupId", groupId).apply();
+                            editor.putString("groupName", selectedGroupName).apply();
+                            getParentFragmentManager().setFragmentResult("closed", new Bundle());
                             dismiss();
                         }
                     });

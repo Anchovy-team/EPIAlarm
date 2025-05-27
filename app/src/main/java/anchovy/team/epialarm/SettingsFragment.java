@@ -11,15 +11,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class SettingsFragment extends Fragment implements AuthResultHandler {
 
     private AuthService authService;
     Button loginButton;
-    Button sourceCodeButton;
-    Button searchButton;
     TextView connectionStatus;
+    Button searchGroupButton;
+    Button searchTeacherButton;
+    Button sourceCodeButton;
+    TextView currentGroup;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,71 +32,107 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.settings_connected, container, false);
+        View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        initializeUi(view);
+        connectionStatus = view.findViewById(R.id.connection_status);
+        loginButton = view.findViewById(R.id.login_button);
+        searchGroupButton = view.findViewById(R.id.search_group_button);
+        searchTeacherButton = view.findViewById(R.id.search_teacher_button);
+        currentGroup = view.findViewById(R.id.current_group);
+        sourceCodeButton = view.findViewById(R.id.source_button);
+
+        initializeUi();
+
         authService = new AuthService();
         authService.createClientApp(getContext(), this);
-        updateui();
 
         return view;
     }
 
-    private void initializeUi(@NonNull final View view) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        connectionStatus = view.findViewById(R.id.connection_status);
-        loginButton = view.findViewById(R.id.login_button);
-        searchButton = view.findViewById(R.id.search_button);
-        sourceCodeButton = view.findViewById(R.id.source_button);
+        getParentFragmentManager().setFragmentResultListener(
+                "closed", getViewLifecycleOwner(), (requestKey, bundle) -> {
+                    updateUi();
+                });
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUi();
+    }
+
+    private void initializeUi() {
         AuthResultHandler handler = this;
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (authService.getmAccount() == null) {
-                    authService.signIn(getActivity(), handler);
+                    authService.signIn(requireActivity(), handler);
                 } else {
                     authService.signOut(handler);
                 }
             }
         });
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        searchGroupButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 SearchGroupFragment dialog = new SearchGroupFragment();
                 dialog.show(getParentFragmentManager(), "searchDialog");
             }
         });
 
+        searchTeacherButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //TODO
+            }
+        });
+
         sourceCodeButton.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                    "https://github.com/arcreane/android-project-ionis-group-alarm"));
+                    "https://github.com/Anchovy-team/EPIAlarm"));
             startActivity(intent);
         });
     }
 
-    private void updateui() {
-        //TODO: whether it's a teacher, change "Search Group" to "Search Teacher"
-        if (authService.getmAccount() != null) {
-            loginButton.setText("Logout");
-            connectionStatus.setText("Connected");
-            searchButton.setVisibility(View.VISIBLE);
+    private void updateUi() {
+        boolean isLoggedIn = authService.getmAccount() != null;
+        searchGroupButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
+        searchTeacherButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
+
+        loginButton.setText(isLoggedIn ? "Logout" : "Login");
+        connectionStatus.setText(isLoggedIn ? "Connected" : "Not connected");
+
+        if (isLoggedIn) {
             SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                     Context.MODE_PRIVATE);
             prefs.edit().putString("user_token", authService.getAccesToken()).apply();
+            String groupName = prefs.getString("groupName", null);
+            if (groupName != null) {
+                currentGroup.setText("Your group: " + groupName);
+            } else {
+                currentGroup.setText("Your group:");
+            }
         } else {
-            loginButton.setText("Login");
-            connectionStatus.setText("Not connected");
-            searchButton.setVisibility(View.INVISIBLE);
+            currentGroup.setText("Your group:");
         }
     }
 
     @Override
     public void onAuthSuccess(String accessToken) {
-        updateui();
+        updateUi();
     }
 
     @Override
     public void onSignedOut() {
-        updateui();
+        SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
+                Context.MODE_PRIVATE);
+        prefs.edit().putString("user_token", null).apply();
+        prefs.edit().putLong("groupId", -1).apply();
+        prefs.edit().putString("groupName", null).apply();
+        updateUi();
     }
 }
