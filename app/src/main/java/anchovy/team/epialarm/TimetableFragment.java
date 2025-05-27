@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import java.time.LocalDate;
@@ -44,6 +44,8 @@ public class TimetableFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+        ListView listView = view.findViewById(R.id.LessonsListView);
+        TextView emptyMessage = view.findViewById(R.id.empty_message);
 
         SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
@@ -51,13 +53,18 @@ public class TimetableFragment extends Fragment {
         long groupId = prefs.getLong("groupId", -1);
 
         if (token == null) {
-            Toast.makeText(getContext(), "Nothing to see here, you are not authorized",
-                    Toast.LENGTH_SHORT).show();
+            emptyMessage.setText("Nothing to see here, you are not authorized");
+            emptyMessage.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
             return view;
         } else if (groupId == -1) {
-            Toast.makeText(getContext(), "You have to choose a group!", Toast.LENGTH_SHORT)
-                    .show();
+            emptyMessage.setText("You have to choose a group!");
+            emptyMessage.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
             return view;
+        } else {
+            emptyMessage.setVisibility(View.GONE);
+            listView.setVisibility(View.VISIBLE);
         }
 
         try {
@@ -84,7 +91,6 @@ public class TimetableFragment extends Fragment {
                     return null;
                 });
 
-        ListView listView = view.findViewById(R.id.LessonsListView);
         listView.setClickable(true);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
