@@ -15,9 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,7 +70,8 @@ public class SearchGroupFragment extends DialogFragment {
                                 .orElse(null);
 
                         if (selectedGroup != null) {
-                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
+                                    .get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
                             int groupId = selectedGroup.getId();

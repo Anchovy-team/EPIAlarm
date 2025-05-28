@@ -18,8 +18,12 @@ import androidx.lifecycle.ViewModelProvider;
 public class SettingsFragment extends Fragment implements AuthResultHandler {
 
     private AuthService authService;
-    Button loginButton, searchGroupButton, searchTeacherButton, sourceCodeButton;
-    TextView connectionStatus, currentGroup;
+    Button loginButton;
+    Button searchGroupButton;
+    Button searchTeacherButton;
+    Button sourceCodeButton;
+    TextView connectionStatus;
+    TextView currentGroup;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,7 +138,8 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
         editor.putString("groupName", null);
         editor.putLong("teacherId", -1);
         editor.apply();
-        TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+        TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
+                .get(TimetableViewModel.class);
         viewModel.reservations = null;
         viewModel.groupedReservations.clear();
         updateUi();
