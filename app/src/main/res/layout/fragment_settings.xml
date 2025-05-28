@@ -70,7 +70,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="46dp"
-        android:text="Your group: "
+        android:text="Chosen value: "
         android:textColor="@color/black"
         android:textSize="20sp" />
 
