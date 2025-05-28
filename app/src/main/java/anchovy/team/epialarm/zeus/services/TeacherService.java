@@ -1,10 +1,10 @@
 package anchovy.team.epialarm.zeus.services;
 
+import anchovy.team.epialarm.zeus.client.ZeusApiClient;
+import anchovy.team.epialarm.zeus.models.Teacher;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import anchovy.team.epialarm.zeus.client.ZeusApiClient;
-import anchovy.team.epialarm.zeus.models.Teacher;
 
 public class TeacherService {
     private final ZeusApiClient apiClient;

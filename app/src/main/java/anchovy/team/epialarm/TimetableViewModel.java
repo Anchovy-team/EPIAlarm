@@ -1,11 +1,11 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.zeus.models.Reservation;
 import androidx.lifecycle.ViewModel;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import anchovy.team.epialarm.zeus.models.Reservation;
 
 public class TimetableViewModel extends ViewModel {
     public List<Reservation> reservations = null;

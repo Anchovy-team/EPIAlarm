@@ -101,30 +101,30 @@ public class TimetableFragment extends Fragment {
 
             reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
                     today, oneWeekForward).thenAccept(reservations1 -> {
-                reservations = reservations1;
-                requireActivity().runOnUiThread(() -> {
-                    setReservations(reservations, view);
-                });
-            }).exceptionally(ex -> {
-                ex.printStackTrace();
-                return null;
-            });
-        }
-        else if (teacherId != -1) {
+                        reservations = reservations1;
+                        requireActivity().runOnUiThread(() -> {
+                            setReservations(reservations, view);
+                        });
+                    }).exceptionally(ex -> {
+                        ex.printStackTrace();
+                        return null;
+                    });
+
+        } else if (teacherId != -1) {
 
             List<Long> teachers = new ArrayList<>();
             teachers.add(teacherId);
 
             reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
                     teachers, today, oneWeekForward).thenAccept(reservations1 -> {
-                reservations = reservations1;
-                requireActivity().runOnUiThread(() -> {
-                    setReservations(reservations, view);
-                });
-            }).exceptionally(ex -> {
-                ex.printStackTrace();
-                return null;
-            });
+                        reservations = reservations1;
+                        requireActivity().runOnUiThread(() -> {
+                            setReservations(reservations, view);
+                        });
+                    }).exceptionally(ex -> {
+                        ex.printStackTrace();
+                        return null;
+                    });
         }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -197,7 +197,6 @@ public class TimetableFragment extends Fragment {
         if (isAdded() && getContext() != null) {
             CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(),
                     reservationsGrouped);
-            ListView listView = view.findViewById(R.id.LessonsListView);
             listView.setAdapter(customBaseAdapter);
             if (customBaseAdapter.isEmpty()) {
                 emptyMessage.setText("No classes found :(");

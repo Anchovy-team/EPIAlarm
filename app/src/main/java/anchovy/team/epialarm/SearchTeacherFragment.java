@@ -1,5 +1,8 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.zeus.client.ZeusApiClient;
+import anchovy.team.epialarm.zeus.models.Teacher;
+import anchovy.team.epialarm.zeus.services.TeacherService;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,17 +14,9 @@ import android.widget.ListView;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import anchovy.team.epialarm.zeus.client.ZeusApiClient;
-import anchovy.team.epialarm.zeus.models.Group;
-import anchovy.team.epialarm.zeus.models.Teacher;
-import anchovy.team.epialarm.zeus.services.GroupsService;
-import anchovy.team.epialarm.zeus.services.TeacherService;
 
 public class SearchTeacherFragment extends DialogFragment {
     private final List<String> filteredTeachers = new ArrayList<>();
@@ -29,7 +24,7 @@ public class SearchTeacherFragment extends DialogFragment {
     private final ZeusApiClient clientService = new ZeusApiClient();
     private TeacherService teacherService;
     private List<Teacher> allTeachers;
-    private List<String> teacherNames = new ArrayList<>();;
+    private List<String> teacherNames = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,12 +64,14 @@ public class SearchTeacherFragment extends DialogFragment {
                     listView.setOnItemClickListener((parent, v, position, id) -> {
                         String selectedTeacherName = filteredTeachers.get(position);
                         Teacher selectedTeacher = allTeachers.stream()
-                                .filter(t -> (t.getFirstname() + " " + t.getName()).equals(selectedTeacherName))
+                                .filter(t -> (t.getFirstname() + " " + t.getName())
+                                        .equals(selectedTeacherName))
                                 .findFirst()
                                 .orElse(null);
 
                         if (selectedTeacher != null) {
-                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
+                                    .get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
                             SharedPreferences.Editor editor = prefs.edit();
