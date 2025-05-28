@@ -14,18 +14,17 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SearchGroupFragment extends DialogFragment {
-
     private List<Group> allGroups;
     private List<String> groupNames;
     private ArrayAdapter<String> adapter;
-    private final List<String> allGroupsTest = Arrays.asList("Lyon M1", "PREPA PARIS",
-            "Toulouse M2", "PREPA Lyon", "ME Paris", "KB L1", "KB L2", "KB L3");
     private final List<String> filteredGroups = new ArrayList<>();
     private final ZeusApiClient clientService = new ZeusApiClient();
     private GroupsService groupsService;
@@ -73,11 +72,14 @@ public class SearchGroupFragment extends DialogFragment {
                                 .orElse(null);
 
                         if (selectedGroup != null) {
+                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                            viewModel.reservations = null;
+                            viewModel.groupedReservations.clear();
                             int groupId = selectedGroup.getId();
-                            //System.out.println("send group Id: " + groupId);
                             SharedPreferences.Editor editor = prefs.edit();
-                            editor.putLong("groupId", groupId).apply();
-                            editor.putString("groupName", selectedGroupName).apply();
+                            editor.putLong("groupId", groupId);
+                            editor.putString("groupName", selectedGroupName);
+                            editor.apply();
                             getParentFragmentManager().setFragmentResult("closed", new Bundle());
                             dismiss();
                         }

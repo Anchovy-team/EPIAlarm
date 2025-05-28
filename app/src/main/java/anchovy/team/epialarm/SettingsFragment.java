@@ -13,16 +13,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 public class SettingsFragment extends Fragment implements AuthResultHandler {
 
     private AuthService authService;
-    Button loginButton;
-    TextView connectionStatus;
-    Button searchGroupButton;
-    Button searchTeacherButton;
-    Button sourceCodeButton;
-    TextView currentGroup;
+    Button loginButton, searchGroupButton, searchTeacherButton, sourceCodeButton;
+    TextView connectionStatus, currentGroup;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,7 +84,8 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
 
         searchTeacherButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //TODO
+                SearchTeacherFragment dialog = new SearchTeacherFragment();
+                dialog.show(getParentFragmentManager(), "searchDialog");
             }
         });
 
@@ -112,12 +110,12 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
             prefs.edit().putString("user_token", authService.getAccesToken()).apply();
             String groupName = prefs.getString("groupName", null);
             if (groupName != null) {
-                currentGroup.setText("Your group: " + groupName);
+                currentGroup.setText("Chosen value: " + groupName);
             } else {
-                currentGroup.setText("Your group:");
+                currentGroup.setText("Chosen value:");
             }
         } else {
-            currentGroup.setText("Your group:");
+            currentGroup.setText("Chosen value:");
         }
     }
 
@@ -130,9 +128,15 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     public void onSignedOut() {
         SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
-        prefs.edit().putString("user_token", null).apply();
-        prefs.edit().putLong("groupId", -1).apply();
-        prefs.edit().putString("groupName", null).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("user_token", null);
+        editor.putLong("groupId", -1);
+        editor.putString("groupName", null);
+        editor.putLong("teacherId", -1);
+        editor.apply();
+        TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+        viewModel.reservations = null;
+        viewModel.groupedReservations.clear();
         updateUi();
     }
 }

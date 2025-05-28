@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,10 +34,15 @@ public class TimetableFragment extends Fragment {
     ZeusApiClient clientService = new ZeusApiClient();
     ReservationService reservationService;
     List<Reservation> reservations;
+    private TimetableViewModel viewModel;
+    private TextView emptyMessage;
+    private ListView listView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+        reservationsGrouped = new TreeMap<>();
     }
 
     @Override
@@ -44,21 +50,31 @@ public class TimetableFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
-        ListView listView = view.findViewById(R.id.LessonsListView);
-        TextView emptyMessage = view.findViewById(R.id.empty_message);
+
+        if (viewModel.reservations != null && !viewModel.reservations.isEmpty()) {
+            reservationsGrouped = viewModel.groupedReservations;
+            reservations = viewModel.reservations;
+            loadData(view);
+            return view;
+        }
+
+        listView = view.findViewById(R.id.LessonsListView);
+        listView.setClickable(true);
+        emptyMessage = view.findViewById(R.id.empty_message);
 
         SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
         String token = prefs.getString("user_token", null);
         long groupId = prefs.getLong("groupId", -1);
+        long teacherId = prefs.getLong("teacherId", -1);
 
         if (token == null) {
             emptyMessage.setText("Nothing to see here, you are not authorized");
             emptyMessage.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
             return view;
-        } else if (groupId == -1) {
-            emptyMessage.setText("You have to choose a group!");
+        } else if (groupId == -1 && teacherId == -1) {
+            emptyMessage.setText("You have to choose a group or a teacher!");
             emptyMessage.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
             return view;
@@ -75,23 +91,42 @@ public class TimetableFragment extends Fragment {
 
         reservationService = new ReservationService(clientService);
         reservationsGrouped = new TreeMap<>();
-        List<Long> groups = new ArrayList<>();
-        groups.add(groupId);
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
 
-        reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
-                today, oneWeekForward).thenAccept(reservations1 -> {
-                    reservations = reservations1;
-                    requireActivity().runOnUiThread(() -> {
-                        setReservations(reservations, view);
-                    });
-                }).exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return null;
-                });
+        if (groupId != -1) {
 
-        listView.setClickable(true);
+            List<Long> groups = new ArrayList<>();
+            groups.add(groupId);
+
+            reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
+                    today, oneWeekForward).thenAccept(reservations1 -> {
+                reservations = reservations1;
+                requireActivity().runOnUiThread(() -> {
+                    setReservations(reservations, view);
+                });
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                return null;
+            });
+        }
+        else if (teacherId != -1) {
+
+            List<Long> teachers = new ArrayList<>();
+            teachers.add(teacherId);
+
+            reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
+                    teachers, today, oneWeekForward).thenAccept(reservations1 -> {
+                reservations = reservations1;
+                requireActivity().runOnUiThread(() -> {
+                    setReservations(reservations, view);
+                });
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                return null;
+            });
+        }
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -164,6 +199,11 @@ public class TimetableFragment extends Fragment {
                     reservationsGrouped);
             ListView listView = view.findViewById(R.id.LessonsListView);
             listView.setAdapter(customBaseAdapter);
+            if (customBaseAdapter.isEmpty()) {
+                emptyMessage.setText("No classes found :(");
+                emptyMessage.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -171,6 +211,7 @@ public class TimetableFragment extends Fragment {
         if (reservations == null) {
             return;
         }
+
         for (Reservation r : reservations) {
             ZoneId parisZone = ZoneId.of("Europe/Paris");
             ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
@@ -181,6 +222,10 @@ public class TimetableFragment extends Fragment {
                     .withZoneSameInstant(parisZone).toLocalDateTime());
             reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
+
+        viewModel.reservations = reservations;
+        viewModel.groupedReservations = reservationsGrouped;
+
         loadData(view);
     }
 }
