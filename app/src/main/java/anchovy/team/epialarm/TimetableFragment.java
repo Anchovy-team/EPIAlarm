@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class TimetableFragment extends Fragment {
 
@@ -37,17 +39,18 @@ public class TimetableFragment extends Fragment {
     private TimetableViewModel viewModel;
     private TextView emptyMessage;
     private ListView listView;
+    private UserSession session;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
         reservationsGrouped = new TreeMap<>();
+        session = UserSession.getInstance();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
 
@@ -62,18 +65,18 @@ public class TimetableFragment extends Fragment {
         listView.setClickable(true);
         emptyMessage = view.findViewById(R.id.empty_message);
 
-        SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
-                Context.MODE_PRIVATE);
-        String token = prefs.getString("user_token", null);
-        long groupId = prefs.getLong("groupId", -1);
-        long teacherId = prefs.getLong("teacherId", -1);
+        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
+                Context.MODE_PRIVATE);*/
+        //String token = prefs.getString("user_token", null);
+        //long groupId = prefs.getLong("groupId", -1);
+        //long teacherId = prefs.getLong("teacherId", -1);
 
-        if (token == null) {
+        if (session.getToken() == null) {
             emptyMessage.setText("Nothing to see here, you are not authorized");
             emptyMessage.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
             return view;
-        } else if (groupId == -1 && teacherId == -1) {
+        } else if (session.getChosenType() == null) {
             emptyMessage.setText("You have to choose a group or a teacher!");
             emptyMessage.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
@@ -84,7 +87,7 @@ public class TimetableFragment extends Fragment {
         }
 
         try {
-            clientService.authenticate(token).thenAccept(token1 -> {}).join();
+            clientService.authenticate(session.getToken()).thenAccept(token1 -> {}).join();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -94,10 +97,10 @@ public class TimetableFragment extends Fragment {
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
 
-        if (groupId != -1) {
+        if (session.getGroupId() != -1) {
 
             List<Long> groups = new ArrayList<>();
-            groups.add(groupId);
+            groups.add(session.getGroupId());
 
             reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
                     today, oneWeekForward).thenAccept(reservations1 -> {
@@ -110,10 +113,10 @@ public class TimetableFragment extends Fragment {
                         return null;
                     });
 
-        } else if (teacherId != -1) {
+        } else if (session.getTeacherId() != -1) {
 
             List<Long> teachers = new ArrayList<>();
-            teachers.add(teacherId);
+            teachers.add(session.getTeacherId());
 
             reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
                     teachers, today, oneWeekForward).thenAccept(reservations1 -> {
@@ -134,8 +137,7 @@ public class TimetableFragment extends Fragment {
                 if (itemRead instanceof DateHeaderItem) {
                     return;
                 }
-                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
-                        position);
+                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(position);
                 Reservation item = reservationItem.getReservation();
 
                 Bundle args = new Bundle();
@@ -143,42 +145,28 @@ public class TimetableFragment extends Fragment {
                 args.putString("activityType", item.getTypeName());
                 LocalDateTime start = item.getStartDate();
                 LocalDateTime end = item.getEndDate();
-                DateTimeFormatter dateFormatter = DateTimeFormatter
-                        .ofPattern("dd/MM/yyyy HH:mm");
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
                 String result = dateFormatter.format(start) + " - " + timeFormatter.format(end);
                 args.putString("classHours", result);
 
                 Teacher[] teachers = item.getTeachers();
-                StringBuilder builder1 = new StringBuilder();
-                for (int i = 0; i < teachers.length; i++) {
-                    builder1.append(teachers[i].getFirstname()).append(" ").append(teachers[i]
-                            .getName());
-                    if (i < teachers.length - 1) {
-                        builder1.append(", ");
-                    }
-                }
-                args.putString("professorName", builder1.toString());
+                String professorName = Arrays.stream(teachers)
+                        .map(Teacher::getFullName)
+                        .collect(Collectors.joining(", "));
+                args.putString("professorName", professorName);
 
                 Room[] rooms = item.getRooms();
-                StringBuilder builder2 = new StringBuilder();
-                for (int i = 0; i < rooms.length; i++) {
-                    builder2.append(rooms[i].getName());
-                    if (i < rooms.length - 1) {
-                        builder2.append(", ");
-                    }
-                }
-                args.putString("classroom", builder2.toString());
+                String classroom = Arrays.stream(rooms)
+                        .map(Room::getName)
+                        .collect(Collectors.joining(", "));
+                args.putString("classroom", classroom);
 
                 Group[] groups = item.getGroups();
-                StringBuilder builder3 = new StringBuilder();
-                for (int i = 0; i < groups.length; i++) {
-                    builder3.append(groups[i].getName());
-                    if (i < groups.length - 1) {
-                        builder3.append(", ");
-                    }
-                }
-                args.putString("group", builder3.toString());
+                String groupNames = Arrays.stream(groups)
+                        .map(Group::getName)
+                        .collect(Collectors.joining(", "));
+                args.putString("group", groupNames);
 
                 ClassInfoFragment dialog = new ClassInfoFragment();
                 dialog.setArguments(args);
@@ -195,8 +183,7 @@ public class TimetableFragment extends Fragment {
 
     public void loadData(View view) {
         if (isAdded() && getContext() != null) {
-            CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(),
-                    reservationsGrouped);
+            CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(), reservationsGrouped);
             listView.setAdapter(customBaseAdapter);
             if (customBaseAdapter.isEmpty()) {
                 emptyMessage.setText("No classes found :(");
@@ -213,12 +200,10 @@ public class TimetableFragment extends Fragment {
 
         for (Reservation r : reservations) {
             ZoneId parisZone = ZoneId.of("Europe/Paris");
-            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
-                    .withZoneSameInstant(parisZone);
+            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();
             r.setStartDate(parisDateTime.toLocalDateTime());
-            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC"))
-                    .withZoneSameInstant(parisZone).toLocalDateTime());
+            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone).toLocalDateTime());
             reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
 

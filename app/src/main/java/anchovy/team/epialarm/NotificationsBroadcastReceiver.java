@@ -62,8 +62,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             //TODO: use 5 minutes as the postpone gap, 15 seconds are for testing
             // decrease advanceMinutes variable each time
             long delay = System.currentTimeMillis() + 15 * 1000;
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context
-                    .ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, delay, pendingIntent);
 
         } else if (Objects.equals(alarmOrNotification, "alarm")
@@ -75,8 +74,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private void sendAlarmOrNotification(Context context, String alarmOrNotification) {
 
-        NotificationManager notificationManager = context.getSystemService(NotificationManager
-                .class);
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
         if (notificationManager.getNotificationChannel(channelID) == null) {
             NotificationChannel channel = new NotificationChannel(channelID, "Alarm Channel",
                     NotificationManager.IMPORTANCE_HIGH);
@@ -119,10 +117,8 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
                     .setAutoCancel(false)
                     .setFullScreenIntent(fullScreenPendingIntent, true)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-                    .addAction(android.R.drawable.ic_menu_close_clear_cancel, "CLOSE",
-                            closePendingIntent)
-                    .addAction(android.R.drawable.ic_menu_revert, "POSTPONE",
-                            snoozePendingIntent);
+                    .addAction(android.R.drawable.ic_menu_close_clear_cancel, "CLOSE", closePendingIntent)
+                    .addAction(android.R.drawable.ic_menu_revert, "POSTPONE", snoozePendingIntent);
 
             if (vibration) {
                 builder.setVibrate(new long[]{0, 500, 1000});

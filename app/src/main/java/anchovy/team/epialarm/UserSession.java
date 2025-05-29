@@ -1,14 +1,14 @@
 package anchovy.team.epialarm;
 
 public class UserSession {
-    /*private static UserSession instance;
+    private static UserSession instance;
 
     private String token;
+    private String chosenType;
     private long groupId;
-    private long userId;
-
-    private ZeusApiClient zeusClient;
-    private ReservationService reservationService;
+    private long teacherId;
+    private String groupName;
+    private String teacherName;
 
     private UserSession() {}
 
@@ -19,46 +19,60 @@ public class UserSession {
         return instance;
     }
 
-    public void initialize(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        token = prefs.getString("user_token", null);
-        groupId = prefs.getLong("groupId", -1);
-        userId = prefs.getLong("userId", -1); // если надо
-
-        if (token != null) {
-            zeusClient = new ZeusApiClient();
-            zeusClient.authenticate(token).join();
-            reservationService = new ReservationService(zeusClient);
-        }
-    }
-
-    public boolean isAuthenticated() {
-        return token != null && zeusClient != null;
+    public void clear() {
+        chosenType = null;
+        token = null;
+        groupId = -1;
+        groupName = null;
+        teacherId = -1;
+        teacherName = null;
     }
 
     public String getToken() {
         return token;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getChosenType() {
+        return chosenType;
+    }
+
+    public void setChosenType(String chosenType) {
+        this.chosenType = chosenType;
+    }
+
     public long getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Context context, long groupId) {
+    public void setGroupId(long groupId) {
         this.groupId = groupId;
-        SharedPreferences prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        prefs.edit().putLong("groupId", groupId).apply();
     }
 
-    public ReservationService getReservationService() {
-        return reservationService;
+    public long getTeacherId() {
+        return teacherId;
     }
 
-    public void clear() {
-        token = null;
-        groupId = -1;
-        userId = -1;
-        zeusClient = null;
-        reservationService = null;
-    }*/
+    public void setTeacherId(long teacherId) {
+        this.teacherId = teacherId;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
 }

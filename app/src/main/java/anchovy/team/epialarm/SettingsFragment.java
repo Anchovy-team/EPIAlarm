@@ -1,8 +1,6 @@
 package anchovy.team.epialarm;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,15 +22,16 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     Button sourceCodeButton;
     TextView connectionStatus;
     TextView currentGroup;
+    private UserSession session;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        session = UserSession.getInstance();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         connectionStatus = view.findViewById(R.id.connection_status);
@@ -94,8 +93,7 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
         });
 
         sourceCodeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                    "https://github.com/Anchovy-team/EPIAlarm"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Anchovy-team/EPIAlarm"));
             startActivity(intent);
         });
     }
@@ -109,12 +107,13 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
         connectionStatus.setText(isLoggedIn ? "Connected" : "Not connected");
 
         if (isLoggedIn) {
-            SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
+            /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                     Context.MODE_PRIVATE);
             prefs.edit().putString("user_token", authService.getAccesToken()).apply();
-            String groupName = prefs.getString("groupName", null);
-            if (groupName != null) {
-                currentGroup.setText("Chosen value: " + groupName);
+            String groupName = prefs.getString("groupName", null);*/
+            session.setToken(authService.getAccesToken());
+            if (session.getGroupName() != null) {
+                currentGroup.setText("Chosen value: " + session.getGroupName());
             } else {
                 currentGroup.setText("Chosen value:");
             }
@@ -130,16 +129,16 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
 
     @Override
     public void onSignedOut() {
-        SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
+        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("user_token", null);
         editor.putLong("groupId", -1);
         editor.putString("groupName", null);
         editor.putLong("teacherId", -1);
-        editor.apply();
-        TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
-                .get(TimetableViewModel.class);
+        editor.apply();*/
+        session.clear();
+        TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
         viewModel.reservations = null;
         viewModel.groupedReservations.clear();
         updateUi();
