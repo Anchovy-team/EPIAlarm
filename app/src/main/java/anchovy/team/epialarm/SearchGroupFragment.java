@@ -5,6 +5,7 @@ import anchovy.team.epialarm.zeus.models.Group;
 import anchovy.team.epialarm.zeus.services.GroupsService;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.session.MediaSessionManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +27,14 @@ public class SearchGroupFragment extends DialogFragment {
     private final List<String> filteredGroups = new ArrayList<>();
     private final ZeusApiClient clientService = new ZeusApiClient();
     private GroupsService groupsService;
+    private UserSession session;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
-        String token = prefs.getString("user_token", null);
+        String token = prefs.getString("user_token", null);*/
+        session = UserSession.getInstance();
 
         View view = inflater.inflate(R.layout.fragment_search_group, container, false);
 
@@ -40,7 +42,7 @@ public class SearchGroupFragment extends DialogFragment {
         searchView.setQueryHint("Search group...");
         ListView listView = view.findViewById(R.id.groupListView);
 
-        clientService.authenticate(token).thenAccept(authToken -> {
+        clientService.authenticate(session.getToken()).thenAccept(authToken -> {
             groupsService = new GroupsService(clientService);
 
             groupsService.getAllGroups().thenAccept(groups -> {
@@ -55,8 +57,7 @@ public class SearchGroupFragment extends DialogFragment {
 
                 requireActivity().runOnUiThread(() -> {
                     if (adapter == null) {
-                        adapter = new ArrayAdapter<>(requireContext(),
-                                android.R.layout.simple_list_item_1, filteredGroups);
+                        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredGroups);
                         listView.setAdapter(adapter);
                     } else {
                         adapter.notifyDataSetChanged();
@@ -70,15 +71,16 @@ public class SearchGroupFragment extends DialogFragment {
                                 .orElse(null);
 
                         if (selectedGroup != null) {
-                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
-                                    .get(TimetableViewModel.class);
+                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
-                            int groupId = selectedGroup.getId();
-                            SharedPreferences.Editor editor = prefs.edit();
+                            /*SharedPreferences.Editor editor = prefs.edit();
                             editor.putLong("groupId", groupId);
                             editor.putString("groupName", selectedGroupName);
-                            editor.apply();
+                            editor.apply();*/
+                            session.setChosenType("group");
+                            session.setGroupId(selectedGroup.getId());
+                            session.setGroupName(selectedGroupName);
                             getParentFragmentManager().setFragmentResult("closed", new Bundle());
                             dismiss();
                         }

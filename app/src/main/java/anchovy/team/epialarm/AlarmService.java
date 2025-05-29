@@ -34,8 +34,7 @@ public class AlarmService {
         this.gson = new Gson();
     }
 
-    public AlarmData addAlarm(String startTime,
-                              String className, int advanceMinutes, boolean vibration) {
+    public AlarmData addAlarm(String startTime, String className, int advanceMinutes, boolean vibration) {
         AlarmData alarm = new AlarmData();
         alarm.setId(UUID.randomUUID().toString());
         alarm.setStartTime(startTime);
@@ -54,7 +53,6 @@ public class AlarmService {
         
         return alarm;
     }
-
 
     public void updateAlarm(AlarmData alarm) {
         List<AlarmData> alarms = getAlarms();
@@ -121,39 +119,36 @@ public class AlarmService {
     }
 
     public void scheduleAlarm(AlarmData alarm) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent intent = new Intent(context, NotificationsBroadcastReceiver.class);
-            intent.putExtra("alarmOrNotification", "alarm");
-            intent.putExtra("className", alarm.getClassName());
-            intent.putExtra("advanceMinutes", alarm.getAdvanceMinutes());
-            intent.putExtra("vibration", alarm.isVibration());
-            intent.putExtra("alarmId", alarm.getId());
+        Intent intent = new Intent(context, NotificationsBroadcastReceiver.class);
+        intent.putExtra("alarmOrNotification", "alarm");
+        intent.putExtra("className", alarm.getClassName());
+        intent.putExtra("advanceMinutes", alarm.getAdvanceMinutes());
+        intent.putExtra("vibration", alarm.isVibration());
+        intent.putExtra("alarmId", alarm.getId());
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    alarm.getId().hashCode(),
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                alarm.getId().hashCode(),
+                intent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Instant instant = Instant.parse(alarm.getStartTime());
-            ZoneId parisZone = ZoneId.of("Europe/Paris");
-            ZonedDateTime eventTimeParis = instant.atZone(parisZone);
-            ZonedDateTime notifyTimeParis = eventTimeParis.minusMinutes(alarm.getAdvanceMinutes());
-            ZonedDateTime nowParis = ZonedDateTime.now(parisZone);
-            long delayMillis = Duration.between(nowParis, notifyTimeParis).toMillis();
+        Instant instant = Instant.parse(alarm.getStartTime());
+        ZoneId parisZone = ZoneId.of("Europe/Paris");
+        ZonedDateTime eventTimeParis = instant.atZone(parisZone);
+        ZonedDateTime notifyTimeParis = eventTimeParis.minusMinutes(alarm.getAdvanceMinutes());
+        ZonedDateTime nowParis = ZonedDateTime.now(parisZone);
+        long delayMillis = Duration.between(nowParis, notifyTimeParis).toMillis();
 
-            if (delayMillis > 0) {
-                AlarmManager alarmManager =
-                        (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                if (alarmManager != null) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-                            System.currentTimeMillis() + delayMillis, pendingIntent);
-                    Log.d(TAG, "Alarm scheduled: " + alarm.getClassName()
-                            + " in " + alarm.getAdvanceMinutes() + " minutes");
-                }
-            } else {
-                Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
+        if (delayMillis > 0) {
+            AlarmManager alarmManager =
+                    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager != null) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+                        System.currentTimeMillis() + delayMillis, pendingIntent);
+                Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in " + alarm.getAdvanceMinutes() + " minutes");
             }
+        } else {
+            Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
         }
     }
 
@@ -166,8 +161,7 @@ public class AlarmService {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
 
         if (pendingIntent != null) {
-            AlarmManager alarmManager =
-                    (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);
                 pendingIntent.cancel();

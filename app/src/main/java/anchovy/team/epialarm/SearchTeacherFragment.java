@@ -25,37 +25,40 @@ public class SearchTeacherFragment extends DialogFragment {
     private TeacherService teacherService;
     private List<Teacher> allTeachers;
     private List<String> teacherNames = new ArrayList<>();
+    private UserSession session;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        session = UserSession.getInstance();
+
         View view = inflater.inflate(R.layout.fragment_search_teacher, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
         searchView.setQueryHint("Search teacher...");
         ListView listView = view.findViewById(R.id.groupListView);
 
-        SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
+        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
                 Context.MODE_PRIVATE);
-        String token = prefs.getString("user_token", null);
+        String token = prefs.getString("user_token", null);*/
 
-        clientService.authenticate(token).thenAccept(authToken -> {
+        clientService.authenticate(session.getToken()).thenAccept(authToken -> {
             teacherService = new TeacherService(clientService);
 
             teacherService.getAllTeachers().thenAccept(teachers -> {
                 allTeachers = teachers;
 
                 teacherNames = teachers.stream()
-                        .map(t -> t.getFirstname() + " " + t.getName())
+                        .map(Teacher::getFullName)
                         .collect(Collectors.toList());
 
                 filteredTeachers.clear();
                 filteredTeachers.addAll(teacherNames);
 
+                System.out.println(teacherNames);
+
                 requireActivity().runOnUiThread(() -> {
                     if (adapter == null) {
-                        adapter = new ArrayAdapter<>(requireContext(),
-                                android.R.layout.simple_list_item_1, filteredTeachers);
+                        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredTeachers);
                         listView.setAdapter(adapter);
                     } else {
                         adapter.notifyDataSetChanged();
@@ -64,21 +67,22 @@ public class SearchTeacherFragment extends DialogFragment {
                     listView.setOnItemClickListener((parent, v, position, id) -> {
                         String selectedTeacherName = filteredTeachers.get(position);
                         Teacher selectedTeacher = allTeachers.stream()
-                                .filter(t -> (t.getFirstname() + " " + t.getName())
-                                        .equals(selectedTeacherName))
+                                .filter(t -> t.getFullName().equals(selectedTeacherName))
                                 .findFirst()
                                 .orElse(null);
 
                         if (selectedTeacher != null) {
-                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
-                                    .get(TimetableViewModel.class);
+                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
-                            SharedPreferences.Editor editor = prefs.edit();
+                            /*SharedPreferences.Editor editor = prefs.edit();
                             editor.putLong("groupId", -1);
                             editor.putString("groupName", filteredTeachers.get(position));
                             editor.putLong("teacherId", selectedTeacher.getId());
-                            editor.apply();
+                            editor.apply();*/
+                            session.setChosenType("teacher");
+                            session.setTeacherName(filteredTeachers.get(position));
+                            session.setTeacherId(selectedTeacher.getId());
                             getParentFragmentManager().setFragmentResult("closed", new Bundle());
                             dismiss();
                         }

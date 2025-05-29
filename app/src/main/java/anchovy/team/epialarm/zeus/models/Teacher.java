@@ -3,17 +3,16 @@ package anchovy.team.epialarm.zeus.models;
 public class Teacher {
     private int id;
     private String name;
+    private String firstName;
+    private boolean isInternal;
 
-    public Teacher(int id, String name, String firstname,
+    public Teacher(int id, String name, String firstName,
                    boolean isInternal) {
         this.id = id;
         this.name = name;
-        this.firstname = firstname;
+        this.firstName = firstName;
         this.isInternal = isInternal;
     }
-
-    private String firstname;
-    private boolean isInternal;
 
     public String getName() {
         return name;
@@ -23,12 +22,12 @@ public class Teacher {
         this.name = name;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public boolean isInternal() {
@@ -47,9 +46,7 @@ public class Teacher {
         this.id = id;
     }
 
-    public Teacher() {}
-
     public String getFullName() {
-        return firstname + " " + name;
+        return firstName + " " + name;
     }
 }
