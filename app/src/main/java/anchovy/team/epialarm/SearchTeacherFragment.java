@@ -20,7 +20,6 @@ public class SearchTeacherFragment extends DialogFragment {
     private final List<String> filteredTeachers = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private final ZeusApiClient clientService = new ZeusApiClient();
-    private TeacherService teacherService;
     private List<Teacher> allTeachers;
     private List<String> teacherNames = new ArrayList<>();
     private UserSession session;
@@ -31,63 +30,20 @@ public class SearchTeacherFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_search_teacher, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
+        searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search teacher...");
-        ListView listView = view.findViewById(R.id.groupListView);
 
         session = UserSession.getInstance();
+        TeachersViewModel teachersViewModel = new ViewModelProvider(requireActivity()).get(TeachersViewModel.class);
 
-        clientService.authenticate(session.getToken()).thenAccept(authToken -> {
-            teacherService = new TeacherService(clientService);
-
-            teacherService.getAllTeachers().thenAccept(teachers -> {
-                allTeachers = teachers;
-
-                teacherNames = teachers.stream()
-                        .map(Teacher::getFullName)
-                        .collect(Collectors.toList());
-
-                filteredTeachers.clear();
-                filteredTeachers.addAll(teacherNames);
-
-                System.out.println(teacherNames);
-
-                requireActivity().runOnUiThread(() -> {
-                    if (adapter == null) {
-                        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredTeachers);
-                        listView.setAdapter(adapter);
-                    } else {
-                        adapter.notifyDataSetChanged();
-                    }
-
-                    listView.setOnItemClickListener((parent, v, position, id) -> {
-                        String selectedTeacherName = filteredTeachers.get(position);
-                        Teacher selectedTeacher = allTeachers.stream()
-                                .filter(t -> t.getFullName().equals(selectedTeacherName))
-                                .findFirst()
-                                .orElse(null);
-
-                        if (selectedTeacher != null) {
-                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-                            viewModel.reservations = null;
-                            viewModel.groupedReservations.clear();
-                            session.setChosenType("teacher");
-                            session.setTeacherName(filteredTeachers.get(position));
-                            session.setTeacherId(selectedTeacher.getId());
-                            getParentFragmentManager().setFragmentResult("closed", new Bundle());
-                            dismiss();
-                        }
-                    });
-                });
-
-            }).exceptionally(ex -> {
-                ex.printStackTrace();
-                return null;
+        if (teachersViewModel.hasCachedTeachers()) {
+            allTeachers = teachersViewModel.getCachedTeachers();
+            updateTeacherListView(view);
+        } else {
+            clientService.authenticate(session.getToken()).thenAccept(authToken -> {
+                fetchAndCacheTeachers(view, teachersViewModel);
             });
-
-        }).exceptionally(ex -> {
-            ex.printStackTrace();
-            return null;
-        });
+        }
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -128,5 +84,58 @@ public class SearchTeacherFragment extends DialogFragment {
             );
             getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
+    }
+
+    private void updateTeacherListView(View view) {
+        ListView listView = view.findViewById(R.id.groupListView);
+
+        teacherNames = allTeachers.stream()
+                .map(Teacher::getFullName)
+                .collect(Collectors.toList());
+
+        filteredTeachers.clear();
+        filteredTeachers.addAll(teacherNames);
+
+        if (adapter == null) {
+            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredTeachers);
+            listView.setAdapter(adapter);
+        } else {
+            adapter.notifyDataSetChanged();
+        }
+
+        listView.setOnItemClickListener((parent, v, position, id) -> {
+            String selectedTeacherName = filteredTeachers.get(position);
+            Teacher selectedTeacher = allTeachers.stream()
+                    .filter(t -> t.getFullName().equals(selectedTeacherName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (selectedTeacher != null) {
+                TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                viewModel.reservations = null;
+                viewModel.groupedReservations.clear();
+                session.setChosenType("teacher");
+                session.setTeacherName(selectedTeacherName);
+                session.setTeacherId(selectedTeacher.getId());
+                getParentFragmentManager().setFragmentResult("closed", new Bundle());
+                dismiss();
+            }
+        });
+    }
+
+    private void fetchAndCacheTeachers(View view, TeachersViewModel teachersViewModel) {
+        TeacherService teacherService = new TeacherService(clientService);
+
+        teacherService.getAllTeachers().thenAccept(teachers -> {
+            allTeachers = teachers;
+            teachersViewModel.setCachedTeachers(teachers);
+
+            requireActivity().runOnUiThread(() -> {
+                updateTeacherListView(view);
+            });
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
     }
 }

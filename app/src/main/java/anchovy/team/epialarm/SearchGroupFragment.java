@@ -23,7 +23,7 @@ public class SearchGroupFragment extends DialogFragment {
     private ArrayAdapter<String> adapter;
     private final List<String> filteredGroups = new ArrayList<>();
     private final ZeusApiClient clientService = new ZeusApiClient();
-    private GroupsService groupsService;
+    //private GroupsService groupsService;
     private UserSession session;
 
     @Override
@@ -32,61 +32,20 @@ public class SearchGroupFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.fragment_search_group, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
+        searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search group...");
-        ListView listView = view.findViewById(R.id.groupListView);
 
         session = UserSession.getInstance();
+        GroupsViewModel groupsViewModel = new ViewModelProvider(requireActivity()).get(GroupsViewModel.class);
 
-        clientService.authenticate(session.getToken()).thenAccept(authToken -> {
-            groupsService = new GroupsService(clientService);
-
-            groupsService.getAllGroups().thenAccept(groups -> {
-                allGroups = groups;
-
-                groupNames = groups.stream()
-                        .map(Group::getName)
-                        .collect(Collectors.toList());
-
-                filteredGroups.clear();
-                filteredGroups.addAll(groupNames);
-
-                requireActivity().runOnUiThread(() -> {
-                    if (adapter == null) {
-                        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredGroups);
-                        listView.setAdapter(adapter);
-                    } else {
-                        adapter.notifyDataSetChanged();
-                    }
-
-                    listView.setOnItemClickListener((parent, v, position, id) -> {
-                        String selectedGroupName = filteredGroups.get(position);
-                        Group selectedGroup = allGroups.stream()
-                                .filter(g -> g.getName().equals(selectedGroupName))
-                                .findFirst()
-                                .orElse(null);
-
-                        if (selectedGroup != null) {
-                            TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-                            viewModel.reservations = null;
-                            viewModel.groupedReservations.clear();
-                            session.setChosenType("group");
-                            session.setGroupId(selectedGroup.getId());
-                            session.setGroupName(selectedGroupName);
-                            getParentFragmentManager().setFragmentResult("closed", new Bundle());
-                            dismiss();
-                        }
-                    });
-                });
-
-            }).exceptionally(ex -> {
-                ex.printStackTrace();
-                return null;
+        if (groupsViewModel.hasCachedGroups()) {
+            allGroups = groupsViewModel.getCachedGroups();
+            updateGroupListView(view);
+        } else {
+            clientService.authenticate(session.getToken()).thenAccept(authToken -> {
+                fetchAndCacheGroups(view, groupsViewModel);
             });
-
-        }).exceptionally(ex -> {
-            ex.printStackTrace();
-            return null;
-        });
+        }
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -127,5 +86,57 @@ public class SearchGroupFragment extends DialogFragment {
             );
             getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
+    }
+
+    private void updateGroupListView(View view) {
+        ListView listView = view.findViewById(R.id.groupListView);
+
+        groupNames = allGroups.stream()
+                .map(Group::getName)
+                .collect(Collectors.toList());
+
+        filteredGroups.clear();
+        filteredGroups.addAll(groupNames);
+
+        if (adapter == null) {
+            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredGroups);
+            listView.setAdapter(adapter);
+        } else {
+            adapter.notifyDataSetChanged();
+        }
+
+        listView.setOnItemClickListener((parent, v, position, id) -> {
+            String selectedGroupName = filteredGroups.get(position);
+            Group selectedGroup = allGroups.stream()
+                    .filter(g -> g.getName().equals(selectedGroupName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (selectedGroup != null) {
+                TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                viewModel.reservations = null;
+                viewModel.groupedReservations.clear();
+                session.setChosenType("group");
+                session.setGroupId(selectedGroup.getId());
+                session.setGroupName(selectedGroupName);
+                getParentFragmentManager().setFragmentResult("closed", new Bundle());
+                dismiss();
+            }
+        });
+    }
+
+    private void fetchAndCacheGroups(View view, GroupsViewModel groupsViewModel) {
+        GroupsService groupsService = new GroupsService(clientService);
+
+        groupsService.getAllGroups().thenAccept(groups -> {
+            allGroups = groups;
+            groupsViewModel.setCachedGroups(groups);
+            requireActivity().runOnUiThread(() -> {
+                updateGroupListView(view);
+            });
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
     }
 }
