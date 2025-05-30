@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
-import android.os.Build;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -27,8 +26,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        System.out.println("on receive triggered");
 
         final String action = intent.getStringExtra("action");
         final String alarmOrNotification = intent.getStringExtra("alarmOrNotification");
@@ -65,8 +62,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             //TODO: use 5 minutes as the postpone gap, 15 seconds are for testing
             // decrease advanceMinutes variable each time
             long delay = System.currentTimeMillis() + 15 * 1000;
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context
-                    .ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, delay, pendingIntent);
 
         } else if (Objects.equals(alarmOrNotification, "alarm")
@@ -78,62 +74,57 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private void sendAlarmOrNotification(Context context, String alarmOrNotification) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = context.getSystemService(NotificationManager
-                    .class);
-            if (notificationManager.getNotificationChannel(channelID) == null) {
-                NotificationChannel channel = new NotificationChannel(channelID, "Alarm Channel",
-                        NotificationManager.IMPORTANCE_HIGH);
-                notificationManager.createNotificationChannel(channel);
-            }
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelID)
-                    .setSmallIcon(android.R.drawable.ic_dialog_info)
-                    .setContentTitle("Class Notification")
-                    .setContentText(className + " in " + advanceMinutes.toString() + " minutes")
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setCategory(NotificationCompat.CATEGORY_ALARM)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-            if (Objects.equals(alarmOrNotification, "alarm")) {
-                Intent closeIntent = new Intent(context, NotificationsBroadcastReceiver.class);
-                closeIntent.putExtra("action", "close");
-                final PendingIntent closePendingIntent = PendingIntent.getBroadcast(context,
-                        UUID.randomUUID().toString().hashCode(), closeIntent,
-                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-
-                Intent snoozeIntent = new Intent(context, NotificationsBroadcastReceiver.class);
-                snoozeIntent.putExtra("action", "snooze");
-                snoozeIntent.putExtra("className", className);
-                snoozeIntent.putExtra("advanceMinutes", advanceMinutes);
-                PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context,
-                        UUID.randomUUID().toString().hashCode(), snoozeIntent,
-                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-
-                Intent fullScreenIntent = new Intent(context, NotificationsBroadcastReceiver.class);
-                PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
-                        context,
-                        0,
-                        fullScreenIntent,
-                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-
-                builder
-                        .setOngoing(true)
-                        .setTimeoutAfter(0)
-                        .setAutoCancel(false)
-                        .setFullScreenIntent(fullScreenPendingIntent, true)
-                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-                        .addAction(android.R.drawable.ic_menu_close_clear_cancel, "CLOSE",
-                                closePendingIntent)
-                        .addAction(android.R.drawable.ic_menu_revert, "POSTPONE",
-                                snoozePendingIntent);
-
-                if (vibration) {
-                    builder.setVibrate(new long[]{0, 500, 1000});
-                }
-            }
-
-            NotificationManagerCompat.from(context).notify(0, builder.build());
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        if (notificationManager.getNotificationChannel(channelID) == null) {
+            NotificationChannel channel = new NotificationChannel(channelID, "Alarm Channel",
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
         }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelID)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("Class Notification")
+                .setContentText(className + " in " + advanceMinutes.toString() + " minutes")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        if (Objects.equals(alarmOrNotification, "alarm")) {
+            Intent closeIntent = new Intent(context, NotificationsBroadcastReceiver.class);
+            closeIntent.putExtra("action", "close");
+            final PendingIntent closePendingIntent = PendingIntent.getBroadcast(context,
+                    UUID.randomUUID().toString().hashCode(), closeIntent,
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Intent snoozeIntent = new Intent(context, NotificationsBroadcastReceiver.class);
+            snoozeIntent.putExtra("action", "snooze");
+            snoozeIntent.putExtra("className", className);
+            snoozeIntent.putExtra("advanceMinutes", advanceMinutes);
+            PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context,
+                    UUID.randomUUID().toString().hashCode(), snoozeIntent,
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Intent fullScreenIntent = new Intent(context, NotificationsBroadcastReceiver.class);
+            PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    fullScreenIntent,
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+            builder
+                    .setOngoing(true)
+                    .setTimeoutAfter(0)
+                    .setAutoCancel(false)
+                    .setFullScreenIntent(fullScreenPendingIntent, true)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+                    .addAction(android.R.drawable.ic_menu_close_clear_cancel, "CLOSE", closePendingIntent)
+                    .addAction(android.R.drawable.ic_menu_revert, "POSTPONE", snoozePendingIntent);
+
+            if (vibration) {
+                builder.setVibrate(new long[]{0, 500, 1000});
+            }
+        }
+
+        NotificationManagerCompat.from(context).notify(0, builder.build());
     }
 }

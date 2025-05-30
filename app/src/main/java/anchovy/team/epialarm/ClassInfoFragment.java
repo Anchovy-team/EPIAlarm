@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import java.util.Objects;
 
 public class ClassInfoFragment extends DialogFragment {
 
@@ -28,7 +29,12 @@ public class ClassInfoFragment extends DialogFragment {
         if (args != null) {
             className.setText(args.getString("className"));
             classHours.setText(args.getString("classHours"));
-            activityType.setText(args.getString("activityType"));
+            String[] activity = Objects.requireNonNull(args.getString("activityType")).split("\\.");
+            if (activity.length > 1) {
+                activityType.setText(activity[1]);
+            } else {
+                activityType.setText(activity[0]);
+            }
             professorName.setText(args.getString("professorName"));
             classroom.setText(args.getString("classroom"));
             groupNumber.setText(args.getString("group"));

@@ -6,10 +6,23 @@
     android:orientation="vertical"
     tools:context=".TimetableFragment">
 
+    <TextView
+        android:id="@+id/empty_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No data"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="256dp" />
+
     <ListView
         android:id="@+id/LessonsListView"
         android:layout_height="0dp"
         android:layout_width="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>

@@ -1,6 +1,5 @@
 package anchovy.team.epialarm;
 
-
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -46,8 +45,7 @@ public class AuthService {
                 }
 
                 @Override
-                public void onAccountChanged(@Nullable IAccount priorAccount,
-                                             @Nullable IAccount currentAccount) {
+                public void onAccountChanged(@Nullable IAccount priorAccount, @Nullable IAccount currentAccount) {
                     if (currentAccount == null) {
                         System.out.println("acc changed");
                     }
@@ -78,7 +76,6 @@ public class AuthService {
                     }
                 }
         );
-
     }
 
     public void signIn(@NonNull final Activity activity, AuthResultHandler handler) {
@@ -103,7 +100,6 @@ public class AuthService {
             return null;
         });
     }
-
 
     private AuthenticationCallback getAuthInteractiveCallback(AuthResultHandler handler) {
         return new AuthenticationCallback() {
