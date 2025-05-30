@@ -129,39 +129,7 @@ public class TimetableFragment extends Fragment {
                     return;
                 }
                 ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(position);
-                Reservation item = reservationItem.getReservation();
-
-                Bundle args = new Bundle();
-                args.putString("className", item.getName());
-                args.putString("activityType", item.getTypeName());
-                LocalDateTime start = item.getStartDate();
-                LocalDateTime end = item.getEndDate();
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                String result = dateFormatter.format(start) + " - " + timeFormatter.format(end);
-                args.putString("classHours", result);
-
-                Teacher[] teachers = item.getTeachers();
-                String professorName = Arrays.stream(teachers)
-                        .map(Teacher::getFullName)
-                        .collect(Collectors.joining(", "));
-                args.putString("professorName", professorName);
-
-                Room[] rooms = item.getRooms();
-                String classroom = Arrays.stream(rooms)
-                        .map(Room::getName)
-                        .collect(Collectors.joining(", "));
-                args.putString("classroom", classroom);
-
-                Group[] groups = item.getGroups();
-                String groupNames = Arrays.stream(groups)
-                        .map(Group::getName)
-                        .collect(Collectors.joining(", "));
-                args.putString("group", groupNames);
-
-                ClassInfoFragment dialog = new ClassInfoFragment();
-                dialog.setArguments(args);
-                dialog.show(getParentFragmentManager(), "classDialog");
+                OpenClassInfo(reservationItem.getReservation());
             }
         });
         return view;
@@ -205,5 +173,39 @@ public class TimetableFragment extends Fragment {
         viewModel.groupedReservations = reservationsGrouped;
 
         loadData(view);
+    }
+
+    private void OpenClassInfo(Reservation item) {
+        Bundle args = new Bundle();
+        args.putString("className", item.getName());
+        args.putString("activityType", item.getTypeName());
+        LocalDateTime start = item.getStartDate();
+        LocalDateTime end = item.getEndDate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String result = dateFormatter.format(start) + " - " + timeFormatter.format(end);
+        args.putString("classHours", result);
+
+        Teacher[] teachers = item.getTeachers();
+        String professorName = Arrays.stream(teachers)
+                .map(Teacher::getFullName)
+                .collect(Collectors.joining(", "));
+        args.putString("professorName", professorName);
+
+        Room[] rooms = item.getRooms();
+        String classroom = Arrays.stream(rooms)
+                .map(Room::getName)
+                .collect(Collectors.joining(", "));
+        args.putString("classroom", classroom);
+
+        Group[] groups = item.getGroups();
+        String groupNames = Arrays.stream(groups)
+                .map(Group::getName)
+                .collect(Collectors.joining(", "));
+        args.putString("group", groupNames);
+
+        ClassInfoFragment dialog = new ClassInfoFragment();
+        dialog.setArguments(args);
+        dialog.show(getParentFragmentManager(), "classDialog");
     }
 }

@@ -9,6 +9,7 @@ public class UserSession {
     private long teacherId;
     private String groupName;
     private String teacherName;
+    private int advanceMinutes;
 
     private UserSession() {}
 
@@ -26,6 +27,7 @@ public class UserSession {
         groupName = null;
         teacherId = -1;
         teacherName = null;
+        advanceMinutes = -1;
     }
 
     public String getToken() {
@@ -74,5 +76,13 @@ public class UserSession {
 
     public void setTeacherName(String teacherName) {
         this.teacherName = teacherName;
+    }
+
+    public int getAdvanceMinutes() {
+        return advanceMinutes;
+    }
+
+    public void setAdvanceMinutes(int advanceMinutes) {
+        this.advanceMinutes = advanceMinutes;
     }
 }
