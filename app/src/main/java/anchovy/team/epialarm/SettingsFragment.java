@@ -107,15 +107,10 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
         connectionStatus.setText(isLoggedIn ? "Connected" : "Not connected");
 
         if (isLoggedIn) {
-            /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
-                    Context.MODE_PRIVATE);
-            prefs.edit().putString("user_token", authService.getAccesToken()).apply();
-            String groupName = prefs.getString("groupName", null);*/
-            session.setToken(authService.getAccesToken());
-            if (session.getGroupName() != null) {
+            if ("group".equals(session.getChosenType())) {
                 currentGroup.setText("Chosen value: " + session.getGroupName());
-            } else {
-                currentGroup.setText("Chosen value:");
+            } else if ("teacher".equals(session.getChosenType())) {
+                currentGroup.setText("Chosen value: " + session.getTeacherName());
             }
         } else {
             currentGroup.setText("Chosen value:");
@@ -124,19 +119,12 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
 
     @Override
     public void onAuthSuccess(String accessToken) {
+        session.setToken(accessToken);
         updateUi();
     }
 
     @Override
     public void onSignedOut() {
-        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("user_token", null);
-        editor.putLong("groupId", -1);
-        editor.putString("groupName", null);
-        editor.putLong("teacherId", -1);
-        editor.apply();*/
         session.clear();
         TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
         viewModel.reservations = null;
