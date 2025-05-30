@@ -1,15 +1,14 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
-import anchovy.team.epialarm.zeus.models.Group;
-import anchovy.team.epialarm.zeus.services.GroupsService;
+import anchovy.team.epialarm.zeus.models.Teacher;
+import anchovy.team.epialarm.zeus.services.TeacherService;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,61 +16,63 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SearchGroupFragment extends DialogFragment {
-    private List<Group> allGroups;
-    private List<String> groupNames;
+public class SearchTeacherFragment extends DialogFragment {
+    private final List<String> filteredTeachers = new ArrayList<>();
     private ArrayAdapter<String> adapter;
-    private final List<String> filteredGroups = new ArrayList<>();
     private final ZeusApiClient clientService = new ZeusApiClient();
-    private GroupsService groupsService;
+    private TeacherService teacherService;
+    private List<Teacher> allTeachers;
+    private List<String> teacherNames = new ArrayList<>();
     private UserSession session;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_search_group, container, false);
+        View view = inflater.inflate(R.layout.fragment_search_teacher, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
-        searchView.setQueryHint("Search group...");
+        searchView.setQueryHint("Search teacher...");
         ListView listView = view.findViewById(R.id.groupListView);
 
         session = UserSession.getInstance();
 
         clientService.authenticate(session.getToken()).thenAccept(authToken -> {
-            groupsService = new GroupsService(clientService);
+            teacherService = new TeacherService(clientService);
 
-            groupsService.getAllGroups().thenAccept(groups -> {
-                allGroups = groups;
+            teacherService.getAllTeachers().thenAccept(teachers -> {
+                allTeachers = teachers;
 
-                groupNames = groups.stream()
-                        .map(Group::getName)
+                teacherNames = teachers.stream()
+                        .map(Teacher::getFullName)
                         .collect(Collectors.toList());
 
-                filteredGroups.clear();
-                filteredGroups.addAll(groupNames);
+                filteredTeachers.clear();
+                filteredTeachers.addAll(teacherNames);
+
+                System.out.println(teacherNames);
 
                 requireActivity().runOnUiThread(() -> {
                     if (adapter == null) {
-                        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredGroups);
+                        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredTeachers);
                         listView.setAdapter(adapter);
                     } else {
                         adapter.notifyDataSetChanged();
                     }
 
                     listView.setOnItemClickListener((parent, v, position, id) -> {
-                        String selectedGroupName = filteredGroups.get(position);
-                        Group selectedGroup = allGroups.stream()
-                                .filter(g -> g.getName().equals(selectedGroupName))
+                        String selectedTeacherName = filteredTeachers.get(position);
+                        Teacher selectedTeacher = allTeachers.stream()
+                                .filter(t -> t.getFullName().equals(selectedTeacherName))
                                 .findFirst()
                                 .orElse(null);
 
-                        if (selectedGroup != null) {
+                        if (selectedTeacher != null) {
                             TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
-                            session.setChosenType("group");
-                            session.setGroupId(selectedGroup.getId());
-                            session.setGroupName(selectedGroupName);
+                            session.setChosenType("teacher");
+                            session.setTeacherName(filteredTeachers.get(position));
+                            session.setTeacherId(selectedTeacher.getId());
                             getParentFragmentManager().setFragmentResult("closed", new Bundle());
                             dismiss();
                         }
@@ -96,14 +97,14 @@ public class SearchGroupFragment extends DialogFragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filteredGroups.clear();
+                filteredTeachers.clear();
                 if (newText.isEmpty()) {
-                    filteredGroups.addAll(groupNames);
+                    filteredTeachers.addAll(teacherNames);
                 } else {
                     String lowerNewText = newText.toLowerCase();
-                    for (String group : groupNames) {
-                        if (group.toLowerCase().contains(lowerNewText)) {
-                            filteredGroups.add(group);
+                    for (String teacher : teacherNames) {
+                        if (teacher.toLowerCase().contains(lowerNewText)) {
+                            filteredTeachers.add(teacher);
                         }
                     }
                 }

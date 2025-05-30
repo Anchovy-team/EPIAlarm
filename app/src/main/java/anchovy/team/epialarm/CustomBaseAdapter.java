@@ -3,7 +3,6 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,16 +34,9 @@ public class CustomBaseAdapter extends BaseAdapter {
         for (Map.Entry<LocalDate, List<Reservation>> entry : new TreeMap<>(reservationsGrouped)
                 .entrySet()) {
             displayList.add(new DateHeaderItem(entry.getKey()));
-            /*for (Reservation r : entry.getValue()) {
-                displayList.add(new ReservationItem(r));
-            }*/
             entry.getValue().stream()
-                    //.sorted(Comparator.comparing(Reservation::getStartDate))
-                    //.forEach(r -> displayList.add(new ReservationItem(r)));
-                    .sorted(Comparator.comparing(r -> r.getStartDate().plusHours(2)))
+                    .sorted(Comparator.comparing(Reservation::getStartDate))
                     .forEach(r -> {
-                        r.setStartDate(r.getStartDate().plusHours(2));
-                        r.setEndDate(r.getEndDate().plusHours(2));
                         displayList.add(new ReservationItem(r));
                     });
         }
@@ -78,11 +70,8 @@ public class CustomBaseAdapter extends BaseAdapter {
             convertView.setFocusable(false);
             DateHeaderItem headerItem = (DateHeaderItem) displayList.get(position);
             TextView headerText = convertView.findViewById(R.id.dateHeaderText);
-            DateTimeFormatter formatter = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                formatter = DateTimeFormatter.ofPattern("EEEE dd/MM", Locale.ENGLISH);
-                headerText.setText(headerItem.date.format(formatter));
-            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd/MM", Locale.ENGLISH);
+            headerText.setText(headerItem.date.format(formatter));
         } else {
             ReservationItem item = (ReservationItem) displayList.get(position);
             Reservation reservation = item.getReservation();
@@ -91,24 +80,19 @@ public class CustomBaseAdapter extends BaseAdapter {
             TextView textView2 = convertView.findViewById(R.id.TextView2);
 
             String className = reservation.getName();
-            String classroom;
+            String classroom = "";
             if (reservation.getRooms().length > 0) {
                 classroom = reservation.getRooms()[0].getName();
-            } else {
-                classroom = "Online";
             }
             textView1.setText(className);
             textView2.setText(classroom);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LocalTime startTime = reservation.getStartDate().toLocalTime();
-                LocalTime endTime = reservation.getEndDate().toLocalTime();
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                String classTime = timeFormatter.format(startTime) + "\n" + timeFormatter
-                        .format(endTime);
-                TextView textViewTime = convertView.findViewById(R.id.time);
-                textViewTime.setText(classTime);
-            }
+            LocalTime startTime = reservation.getStartDate().toLocalTime();
+            LocalTime endTime = reservation.getEndDate().toLocalTime();
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            String classTime = timeFormatter.format(startTime) + "\n" + timeFormatter.format(endTime);
+            TextView textViewTime = convertView.findViewById(R.id.time);
+            textViewTime.setText(classTime);
         }
 
         return convertView;
