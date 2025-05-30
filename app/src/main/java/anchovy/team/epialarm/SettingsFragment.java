@@ -100,20 +100,20 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
 
     private void updateUi() {
         boolean isLoggedIn = authService.getmAccount() != null;
-        searchGroupButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
-        searchTeacherButton.setVisibility(isLoggedIn ? View.VISIBLE : View.GONE);
+        int visibility = (isLoggedIn ? View.VISIBLE : View.GONE);
+        searchGroupButton.setVisibility(visibility);
+        searchTeacherButton.setVisibility(visibility);
+        currentGroup.setVisibility(visibility);
 
         loginButton.setText(isLoggedIn ? "Logout" : "Login");
         connectionStatus.setText(isLoggedIn ? "Connected" : "Not connected");
 
         if (isLoggedIn) {
             if ("group".equals(session.getChosenType())) {
-                currentGroup.setText("Chosen value: " + session.getGroupName());
+                currentGroup.setText("Chosen Group: " + session.getGroupName());
             } else if ("teacher".equals(session.getChosenType())) {
-                currentGroup.setText("Chosen value: " + session.getTeacherName());
+                currentGroup.setText("Chosen Teacher: " + session.getTeacherName());
             }
-        } else {
-            currentGroup.setText("Chosen value:");
         }
     }
 
