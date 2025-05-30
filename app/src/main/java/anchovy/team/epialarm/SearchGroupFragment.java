@@ -3,9 +3,6 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Group;
 import anchovy.team.epialarm.zeus.services.GroupsService;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.media.session.MediaSessionManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,16 +28,14 @@ public class SearchGroupFragment extends DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
-                Context.MODE_PRIVATE);
-        String token = prefs.getString("user_token", null);*/
-        session = UserSession.getInstance();
 
         View view = inflater.inflate(R.layout.fragment_search_group, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
         searchView.setQueryHint("Search group...");
         ListView listView = view.findViewById(R.id.groupListView);
+
+        session = UserSession.getInstance();
 
         clientService.authenticate(session.getToken()).thenAccept(authToken -> {
             groupsService = new GroupsService(clientService);
@@ -74,10 +69,6 @@ public class SearchGroupFragment extends DialogFragment {
                             TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
-                            /*SharedPreferences.Editor editor = prefs.edit();
-                            editor.putLong("groupId", groupId);
-                            editor.putString("groupName", selectedGroupName);
-                            editor.apply();*/
                             session.setChosenType("group");
                             session.setGroupId(selectedGroup.getId());
                             session.setGroupName(selectedGroupName);

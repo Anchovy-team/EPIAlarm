@@ -59,10 +59,6 @@ public class AlarmFragment extends Fragment {
         long delayMillis = Duration.between(nowParis, notifyTimeParis).toMillis();
         long triggerTimeMillis = System.currentTimeMillis() + delayMillis;
 
-        //System.out.println("nowParis: " + nowParis);
-        //System.out.println("notifyTimeParis: " + notifyTimeParis);
-        //System.out.println("delayMillis: " + delayMillis);
-
         Intent intent = new Intent(context, NotificationsBroadcastReceiver.class);
         intent.putExtra("alarmOrNotification", type);
         intent.putExtra("className", className);

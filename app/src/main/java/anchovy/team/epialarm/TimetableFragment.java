@@ -6,8 +6,6 @@ import anchovy.team.epialarm.zeus.models.Reservation;
 import anchovy.team.epialarm.zeus.models.Room;
 import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.ReservationService;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +21,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class TimetableFragment extends Fragment {
@@ -45,7 +43,6 @@ public class TimetableFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-        reservationsGrouped = new TreeMap<>();
         session = UserSession.getInstance();
     }
 
@@ -54,22 +51,16 @@ public class TimetableFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
 
+        listView = view.findViewById(R.id.LessonsListView);
+        listView.setClickable(true);
+        emptyMessage = view.findViewById(R.id.empty_message);
+
         if (viewModel.reservations != null && !viewModel.reservations.isEmpty()) {
             reservationsGrouped = viewModel.groupedReservations;
             reservations = viewModel.reservations;
             loadData(view);
             return view;
         }
-
-        listView = view.findViewById(R.id.LessonsListView);
-        listView.setClickable(true);
-        emptyMessage = view.findViewById(R.id.empty_message);
-
-        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
-                Context.MODE_PRIVATE);*/
-        //String token = prefs.getString("user_token", null);
-        //long groupId = prefs.getLong("groupId", -1);
-        //long teacherId = prefs.getLong("teacherId", -1);
 
         if (session.getToken() == null) {
             emptyMessage.setText("Nothing to see here, you are not authorized");
@@ -97,7 +88,7 @@ public class TimetableFragment extends Fragment {
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
 
-        if (session.getGroupId() != -1) {
+        if ("group".equals(session.getChosenType())) {
 
             List<Long> groups = new ArrayList<>();
             groups.add(session.getGroupId());
@@ -113,7 +104,7 @@ public class TimetableFragment extends Fragment {
                         return null;
                     });
 
-        } else if (session.getTeacherId() != -1) {
+        } else if ("teacher".equals(session.getChosenType())) {
 
             List<Long> teachers = new ArrayList<>();
             teachers.add(session.getTeacherId());
@@ -184,7 +175,9 @@ public class TimetableFragment extends Fragment {
     public void loadData(View view) {
         if (isAdded() && getContext() != null) {
             CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(), reservationsGrouped);
-            listView.setAdapter(customBaseAdapter);
+            if (listView != null) {
+                listView.setAdapter(customBaseAdapter);
+            }
             if (customBaseAdapter.isEmpty()) {
                 emptyMessage.setText("No classes found :(");
                 emptyMessage.setVisibility(View.VISIBLE);
@@ -199,6 +192,7 @@ public class TimetableFragment extends Fragment {
         }
 
         for (Reservation r : reservations) {
+            System.out.println(r.getName());
             ZoneId parisZone = ZoneId.of("Europe/Paris");
             ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();

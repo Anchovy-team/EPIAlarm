@@ -3,8 +3,6 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.TeacherService;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +27,6 @@ public class SearchTeacherFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        session = UserSession.getInstance();
 
         View view = inflater.inflate(R.layout.fragment_search_teacher, container, false);
 
@@ -37,9 +34,7 @@ public class SearchTeacherFragment extends DialogFragment {
         searchView.setQueryHint("Search teacher...");
         ListView listView = view.findViewById(R.id.groupListView);
 
-        /*SharedPreferences prefs = requireContext().getSharedPreferences("prefs",
-                Context.MODE_PRIVATE);
-        String token = prefs.getString("user_token", null);*/
+        session = UserSession.getInstance();
 
         clientService.authenticate(session.getToken()).thenAccept(authToken -> {
             teacherService = new TeacherService(clientService);
@@ -75,11 +70,6 @@ public class SearchTeacherFragment extends DialogFragment {
                             TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
                             viewModel.reservations = null;
                             viewModel.groupedReservations.clear();
-                            /*SharedPreferences.Editor editor = prefs.edit();
-                            editor.putLong("groupId", -1);
-                            editor.putString("groupName", filteredTeachers.get(position));
-                            editor.putLong("teacherId", selectedTeacher.getId());
-                            editor.apply();*/
                             session.setChosenType("teacher");
                             session.setTeacherName(filteredTeachers.get(position));
                             session.setTeacherId(selectedTeacher.getId());
