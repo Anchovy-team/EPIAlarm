@@ -1,12 +1,38 @@
+import java.util.Properties
+
+val localProperties = Properties()
+val keyStoreProperties = Properties()
+
+val localPropertiesFile = rootProject.file("local.properties")
+val keyStorePropertiesFile = rootProject.file("keystore.properties")
+
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+if (keyStorePropertiesFile.exists()){
+    keyStoreProperties.load(keyStorePropertiesFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = keyStoreProperties["storeFile"]?.let { file(it as String) }
+            storePassword = keyStoreProperties["storePassword"] as String?
+            keyAlias = keyStoreProperties["keyAlias"] as String?
+            keyPassword = keyStoreProperties["keyPassword"] as String?
+        }
+    }
+
     namespace = "anchovy.team.epialarm"
     compileSdk = 35
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "anchovy.team.epialarm"
         minSdk = 26
         targetSdk = 35
@@ -14,6 +40,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig = signingConfigs.getByName("release")
+
+        manifestPlaceholders["msalHost"] = localProperties.getProperty("MSAL_HOST")
+        manifestPlaceholders["msalPath"] = localProperties.getProperty("MSAL_PATH")
     }
 
     buildFeatures {
@@ -23,10 +53,14 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
