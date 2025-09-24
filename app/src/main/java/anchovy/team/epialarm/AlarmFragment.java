@@ -47,7 +47,7 @@ public class AlarmFragment extends Fragment {
                 setAlarmNotification(reservation.time, reservation.name, advance,
                         "alarm", vibration.isChecked());
             }*/
-            setAlarmNotification("2025-05-28T10:00:00.0Z", "Advanced IAM",
+            setAlarmNotification("2025-09-24T14:00:00.0Z", "Advanced IAM",
                     advance, "alarm", vibration.isChecked());
         });
 
