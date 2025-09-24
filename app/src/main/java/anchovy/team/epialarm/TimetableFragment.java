@@ -7,6 +7,7 @@ import anchovy.team.epialarm.zeus.models.Room;
 import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.ReservationService;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import java.time.LocalDate;
@@ -49,8 +51,12 @@ public class TimetableFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_timetable, container, false);
+    }
 
-        View view = inflater.inflate(R.layout.fragment_timetable, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         listView = view.findViewById(R.id.LessonsListView);
         listView.setClickable(true);
@@ -60,81 +66,78 @@ public class TimetableFragment extends Fragment {
             reservationsGrouped = viewModel.groupedReservations;
             reservations = viewModel.reservations;
             loadData(view);
-            return view;
         }
 
         if (session.getToken() == null) {
             emptyMessage.setText("Nothing to see here, you are not authorized");
             emptyMessage.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
-            return view;
         } else if (session.getChosenType() == null) {
             emptyMessage.setText("You have to choose a group or a teacher!");
             emptyMessage.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
-            return view;
         } else {
             emptyMessage.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
-        }
 
-        try {
-            clientService.authenticate(session.getToken()).thenAccept(token1 -> {}).join();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        reservationService = new ReservationService(clientService);
-        reservationsGrouped = new TreeMap<>();
-        LocalDateTime today = LocalDate.now().atStartOfDay();
-        LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
-
-        if ("group".equals(session.getChosenType())) {
-
-            List<Long> groups = new ArrayList<>();
-            groups.add(session.getGroupId());
-
-            reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
-                    today, oneWeekForward).thenAccept(reservations1 -> {
-                        reservations = reservations1;
-                        requireActivity().runOnUiThread(() -> {
-                            setReservations(reservations, view);
-                        });
-                    }).exceptionally(ex -> {
-                        ex.printStackTrace();
-                        return null;
-                    });
-
-        } else if ("teacher".equals(session.getChosenType())) {
-
-            List<Long> teachers = new ArrayList<>();
-            teachers.add(session.getTeacherId());
-
-            reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
-                    teachers, today, oneWeekForward).thenAccept(reservations1 -> {
-                        reservations = reservations1;
-                        requireActivity().runOnUiThread(() -> {
-                            setReservations(reservations, view);
-                        });
-                    }).exceptionally(ex -> {
-                        ex.printStackTrace();
-                        return null;
-                    });
-        }
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object itemRead = parent.getItemAtPosition(position);
-                if (itemRead instanceof DateHeaderItem) {
-                    return;
-                }
-                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
-                        position);
-                openClassInfo(reservationItem.getReservation());
+            try {
+                clientService.authenticate(session.getToken()).thenAccept(token1 -> {
+                }).join();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        });
-        return view;
+
+            reservationService = new ReservationService(clientService);
+            reservationsGrouped = new TreeMap<>();
+            LocalDateTime today = LocalDate.now().atStartOfDay();
+            LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(2);
+
+            if ("group".equals(session.getChosenType())) {
+
+                List<Long> groups = new ArrayList<>();
+                groups.add(session.getGroupId());
+
+                reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
+                        today, oneWeekForward).thenAccept(reservations1 -> {
+                    reservations = reservations1;
+                    requireActivity().runOnUiThread(() -> {
+                        setReservations(reservations, view);
+                    });
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+
+            } else if ("teacher".equals(session.getChosenType())) {
+
+                List<Long> teachers = new ArrayList<>();
+                teachers.add(session.getTeacherId());
+
+                reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
+                        teachers, today, oneWeekForward).thenAccept(reservations1 -> {
+                    reservations = reservations1;
+                    requireActivity().runOnUiThread(() -> {
+                        setReservations(reservations, view);
+                    });
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+            }
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Object itemRead = parent.getItemAtPosition(position);
+                    if (itemRead instanceof DateHeaderItem) {
+                        return;
+                    }
+                    ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
+                            position);
+                    openClassInfo(reservationItem.getReservation());
+                }
+            });
+        }
     }
 
     @Override

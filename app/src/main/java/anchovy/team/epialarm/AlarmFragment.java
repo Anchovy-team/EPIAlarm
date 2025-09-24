@@ -42,12 +42,12 @@ public class AlarmFragment extends Fragment {
         setAlarmButton.setOnClickListener(v -> {
             int advance = hourPicker.getValue() * 60 + minutePicker.getValue();
             SwitchCompat vibration = view.findViewById(R.id.vibrateSwitch);
-            session.setAdvanceMinutes(advance);
+            session.setAdvanceMinutesAlarm(advance);
             /*for (reservation : reservations_today) {
                 setAlarmNotification(reservation.time, reservation.name, advance,
                         "alarm", vibration.isChecked());
             }*/
-            setAlarmNotification("2025-09-24T14:00:00.0Z", "Advanced IAM",
+            setAlarmNotification("2025-09-24T16:30:00.0Z", "Advanced IAM",
                     advance, "alarm", vibration.isChecked());
         });
 
