@@ -29,7 +29,8 @@ public class AlarmFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_alarm, container, false);
 
         NumberPicker hourPicker = view.findViewById(R.id.hourPicker);
@@ -42,7 +43,7 @@ public class AlarmFragment extends Fragment {
             int advance = hourPicker.getValue() * 60 + minutePicker.getValue();
             SwitchCompat vibration = view.findViewById(R.id.vibrateSwitch);
             session.setAdvanceMinutes(advance);
-             /*for (reservation : reservations_today) {
+            /*for (reservation : reservations_today) {
                 setAlarmNotification(reservation.time, reservation.name, advance,
                         "alarm", vibration.isChecked());
             }*/
@@ -82,6 +83,7 @@ public class AlarmFragment extends Fragment {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis,
+                pendingIntent);
     }
 }

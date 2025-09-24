@@ -45,7 +45,8 @@ public class AuthService {
                 }
 
                 @Override
-                public void onAccountChanged(@Nullable IAccount priorAccount, @Nullable IAccount currentAccount) {
+                public void onAccountChanged(@Nullable IAccount priorAccount,
+                                             @Nullable IAccount currentAccount) {
                     if (currentAccount == null) {
                         System.out.println("acc changed");
                     }

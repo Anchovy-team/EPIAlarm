@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,7 +47,8 @@ public class TimetableFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_timetable, container, false);
 
@@ -128,8 +129,9 @@ public class TimetableFragment extends Fragment {
                 if (itemRead instanceof DateHeaderItem) {
                     return;
                 }
-                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(position);
-                OpenClassInfo(reservationItem.getReservation());
+                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
+                        position);
+                openClassInfo(reservationItem.getReservation());
             }
         });
         return view;
@@ -142,7 +144,8 @@ public class TimetableFragment extends Fragment {
 
     public void loadData(View view) {
         if (isAdded() && getContext() != null) {
-            CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(), reservationsGrouped);
+            CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(),
+                    reservationsGrouped);
             if (listView != null) {
                 listView.setAdapter(customBaseAdapter);
             }
@@ -162,10 +165,12 @@ public class TimetableFragment extends Fragment {
         for (Reservation r : reservations) {
             System.out.println(r.getName());
             ZoneId parisZone = ZoneId.of("Europe/Paris");
-            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone);
+            ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();
             r.setStartDate(parisDateTime.toLocalDateTime());
-            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone).toLocalDateTime());
+            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(parisZone).toLocalDateTime());
             reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
 
@@ -175,7 +180,7 @@ public class TimetableFragment extends Fragment {
         loadData(view);
     }
 
-    private void OpenClassInfo(Reservation item) {
+    private void openClassInfo(Reservation item) {
         Bundle args = new Bundle();
         args.putString("className", item.getName());
         args.putString("activityType", item.getTypeName());
