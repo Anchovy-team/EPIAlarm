@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:gravity="center"
+    android:gravity="center_horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
@@ -11,23 +11,38 @@
         android:id="@+id/config_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/config_title"
+        android:text="Alarm &amp; Reminder Settings"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:layout_gravity="center" />
 
-    <TextView
-        android:id="@+id/config_description"
+    <RadioGroup
+        android:id="@+id/modeRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/config_description"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="24dp"
-        android:layout_gravity="center"
-        android:textAlignment="center" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/modeWakeup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alarm"
+            android:checked="true"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:layout_marginEnd="16dp"/>
+
+        <RadioButton
+            android:id="@+id/modeReminders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reminders"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"/>
+    </RadioGroup>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -46,7 +61,6 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +72,7 @@
             android:id="@+id/vibrateLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/vibrate_label"
+            android:text="Vibration"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
@@ -75,8 +89,27 @@
         android:id="@+id/SetAlarmButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/set_alarm"
+        android:text="Save"
         android:layout_marginTop="32dp"
         android:background="@drawable/rounded_button"
         android:textColor="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/today_list_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="For today:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/today_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </LinearLayout>
+
 </LinearLayout>
