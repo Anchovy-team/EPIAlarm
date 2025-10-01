@@ -12,6 +12,7 @@
         android:text="@string/connected"
         android:textSize="24sp"
         android:textColor="#000000"
+        android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,11 +20,10 @@
 
     <Button
         android:id="@+id/login_button"
+        style="@style/Widget.EpiAlarm.PlatformButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
         android:text="Logout"
-        android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/connection_status"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,11 +34,10 @@
 
     <Button
         android:id="@+id/search_group_button"
+        style="@style/Widget.EpiAlarm.PlatformButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
         android:text="@string/search_group"
-        android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/login_button"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,11 +48,10 @@
 
     <Button
         android:id="@+id/search_teacher_button"
+        style="@style/Widget.EpiAlarm.PlatformButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
         android:text="Search Teacher"
-        android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintTop_toBottomOf="@id/search_group_button"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,11 +73,10 @@
 
     <Button
         android:id="@+id/source_button"
+        style="@style/Widget.EpiAlarm.PlatformButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
         android:text="@string/source_code"
-        android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
