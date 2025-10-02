@@ -7,7 +7,6 @@ import anchovy.team.epialarm.zeus.models.Room;
 import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.ReservationService;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,16 +96,17 @@ public class TimetableFragment extends Fragment {
                 List<Long> groups = new ArrayList<>();
                 groups.add(session.getGroupId());
 
-                reservationService.getReservationsByFilter(groups, new ArrayList<>(), new ArrayList<>(),
+                reservationService.getReservationsByFilter(groups, new ArrayList<>(),
+                        new ArrayList<>(),
                         today, oneWeekForward).thenAccept(reservations1 -> {
-                    reservations = reservations1;
-                    requireActivity().runOnUiThread(() -> {
-                        setReservations(reservations, view);
-                    });
-                }).exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return null;
-                });
+                            reservations = reservations1;
+                            requireActivity().runOnUiThread(() -> {
+                                setReservations(reservations, view);
+                            });
+                        }).exceptionally(ex -> {
+                            ex.printStackTrace();
+                            return null;
+                        });
 
             } else if ("teacher".equals(session.getChosenType())) {
 
@@ -115,14 +115,14 @@ public class TimetableFragment extends Fragment {
 
                 reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
                         teachers, today, oneWeekForward).thenAccept(reservations1 -> {
-                    reservations = reservations1;
-                    requireActivity().runOnUiThread(() -> {
-                        setReservations(reservations, view);
-                    });
-                }).exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return null;
-                });
+                            reservations = reservations1;
+                            requireActivity().runOnUiThread(() -> {
+                                setReservations(reservations, view);
+                            });
+                        }).exceptionally(ex -> {
+                            ex.printStackTrace();
+                            return null;
+                        });
             }
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
