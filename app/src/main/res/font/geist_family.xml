@@ -8,8 +8,4 @@
         android:font="@font/geist_medium"
         android:fontStyle="normal"
         android:fontWeight="500" />
-    <font
-        android:font="@font/geist_bold"
-        android:fontStyle="normal"
-        android:fontWeight="700" />
 </font-family>
