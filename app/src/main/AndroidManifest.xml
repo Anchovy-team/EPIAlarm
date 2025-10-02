@@ -23,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EpiAlarm"
         android:usesCleartextTraffic="true"
+        android:name=".EpiAlarmApp"
         tools:targetApi="31">
         <activity
             android:name=".LessonsListView"
@@ -54,7 +55,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="msauth"
                     android:host="anchovy.team.epialarm"
-                    android:path="/xxx" />
+                    android:path="/zUK0MdIxZJ0HiCGzXBE59JekqBk=" />
             </intent-filter>
         </activity>
     </application>
