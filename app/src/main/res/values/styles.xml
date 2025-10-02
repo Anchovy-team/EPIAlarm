@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text appearances for different text types -->
+    <style name="TextAppearance.EpiAlarm.Body" parent="@android:style/TextAppearance.Material.Body1">
+        <!-- Inherits fontFamily from theme -->
+    </style>
+
+    <style name="TextAppearance.EpiAlarm.Title" parent="@android:style/TextAppearance.Material.Headline">
+        <item name="android:fontFamily">@font/geist_medium</item>
+    </style>
+
+    <style name="TextAppearance.EpiAlarm.Button" parent="@android:style/TextAppearance.Material.Button">
+        <item name="android:fontFamily">@font/geist_medium</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.EpiAlarm.PlatformButton" parent="@android:style/Widget.Material.Button">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:background">@drawable/btn_primary_bg</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textAppearance">@style/TextAppearance.EpiAlarm.Button</item>
+    </style>
+    <style name="Widget.EpiAlarm.Button" parent="Widget.Material3.Button">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:background">@drawable/btn_primary_bg</item>
+        <item name="background">@drawable/btn_primary_bg</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textAppearance">@style/TextAppearance.EpiAlarm.Button</item>
+    </style>
+
+    <style name="Widget.EpiAlarm.Button.TextButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:background">@drawable/btn_primary_bg</item>
+        <item name="background">@drawable/btn_primary_bg</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <style name="Widget.EpiAlarm.Button.OutlinedButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:background">@drawable/btn_primary_bg</item>
+        <item name="background">@drawable/btn_primary_bg</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <!-- Apple-style switch -->
+    <style name="Widget.EpiAlarm.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:track">@drawable/switch_track</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
+        <item name="android:switchMinWidth">48dp</item>
+        <item name="android:switchPadding">2dp</item>
+        <item name="android:thumbTint">@null</item>
+        <item name="android:trackTint">@null</item>
+        <item name="thumbTint">@null</item>
+        <item name="trackTint">@null</item>
+    </style>
+</resources>
+

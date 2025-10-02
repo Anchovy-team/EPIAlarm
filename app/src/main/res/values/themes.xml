@@ -1,8 +1,30 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.EpiAlarm" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Default font for ALL text elements -->
+        <item name="android:fontFamily">@font/geist</item>
+        <item name="fontFamily">@font/geist</item>
+        <!-- Text appearances for different text types -->
+        <item name="android:textAppearance">@style/TextAppearance.EpiAlarm.Body</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance.EpiAlarm.Title</item>
+        <item name="android:textAppearanceButton">@style/TextAppearance.EpiAlarm.Button</item>
+        <!-- Global button style (applies to all MaterialButtons) -->
+        <item name="materialButtonStyle">@style/Widget.EpiAlarm.Button</item>
+        <!-- Platform Button style so plain <Button> also gets the design -->
+        <item name="android:buttonStyle">@style/Widget.EpiAlarm.PlatformButton</item>
+        <item name="buttonStyle">@style/Widget.EpiAlarm.PlatformButton</item>
+        <!-- Handle system UI properly -->
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:navigationBarColor">@android:color/white</item>
+        <item name="android:statusBarColor">@android:color/white</item>
+        <!-- Bottom Navigation Colors -->
+        <item name="android:colorPrimary">@color/nav_background</item>
+        <item name="colorPrimary">@color/nav_background</item>
+        <item name="android:colorPrimaryDark">@color/nav_selected</item>
+        <item name="colorPrimaryDark">@color/nav_selected</item>
+        <item name="android:colorAccent">@color/nav_unselected</item>
+        <item name="colorAccent">@color/nav_unselected</item>
     </style>
 
     <style name="Theme.EpiAlarm" parent="Base.Theme.EpiAlarm" />
