@@ -48,6 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:textStyle="bold"
+                    android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
                     android:text="Signed-in user" />
 
                 <TextView
@@ -77,6 +78,7 @@
 
                 <Button
                     android:id="@+id/btn_signIn"
+                    style="@style/Widget.EpiAlarm.PlatformButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
@@ -86,6 +88,7 @@
 
                 <Button
                     android:id="@+id/btn_removeAccount"
+                    style="@style/Widget.EpiAlarm.PlatformButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
@@ -104,6 +107,7 @@
 
             <Button
                 android:id="@+id/btn_acc_tkn"
+                style="@style/Widget.EpiAlarm.PlatformButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -111,6 +115,7 @@
 
             <Button
                 android:id="@+id/zeus_btn"
+                style="@style/Widget.EpiAlarm.PlatformButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
@@ -126,6 +131,7 @@
 
             <Button
                 android:id="@+id/button2"
+                style="@style/Widget.EpiAlarm.PlatformButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Button" />

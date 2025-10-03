@@ -15,6 +15,7 @@
         android:text="Class name"
         android:textStyle="bold"
         android:textSize="18dp"
+        android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
         android:gravity="center"
         android:paddingBottom="8dp" />
 
@@ -30,7 +31,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#000"
+        android:background="#CCCCCC"
         android:layout_marginVertical="8dp" />
 
     <LinearLayout
@@ -43,7 +44,8 @@
             android:layout_height="wrap_content"
             android:text="Activity type"
             android:textSize="16dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.EpiAlarm.Title" />
         <TextView
             android:id="@+id/activityType"
             android:layout_width="wrap_content"
@@ -56,6 +58,7 @@
             android:text="Professor"
             android:textStyle="bold"
             android:textSize="16dp"
+            android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
             android:layout_marginTop="8dp" />
         <TextView
             android:id="@+id/professorName"
@@ -69,6 +72,7 @@
             android:text="Classroom"
             android:textSize="16dp"
             android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
             android:layout_marginTop="8dp" />
         <TextView
             android:id="@+id/classroom"
@@ -82,6 +86,7 @@
             android:text="Group"
             android:textSize="16dp"
             android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
             android:layout_marginTop="8dp" />
         <TextView
             android:id="@+id/groupNumber"

@@ -15,6 +15,7 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
         android:layout_marginBottom="8dp"
         android:layout_gravity="center" />
 
@@ -60,12 +61,13 @@
             android:layout_height="wrap_content"
             android:text="@string/vibrate_label"
             android:textSize="16sp"
-            android:textStyle="bold"
             android:textColor="@android:color/black"
+            android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
             android:layout_marginEnd="8dp" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/vibrateSwitch"
+            style="@style/Widget.EpiAlarm.Switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp" />
@@ -73,10 +75,9 @@
 
     <Button
         android:id="@+id/SetAlarmButton"
+        style="@style/Widget.EpiAlarm.PlatformButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/set_alarm"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/rounded_button"
-        android:textColor="@android:color/white"/>
+        android:layout_marginTop="32dp"/>
 </LinearLayout>
