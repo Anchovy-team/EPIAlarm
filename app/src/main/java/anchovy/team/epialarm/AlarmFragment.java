@@ -1,10 +1,7 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.utils.NumberPickerHelper;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +10,16 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
+import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
 
 public class AlarmFragment extends Fragment {
 
@@ -54,32 +57,12 @@ public class AlarmFragment extends Fragment {
         return view;
     }
 
-    public void setAlarmNotification(String startClass, String className, Integer advanceMinutes,
+    public void setAlarmNotification(String startClass, String className, long advanceMinutes,
                                      String type, Boolean vibration) {
         Context context = requireContext();
 
-        Instant instant = Instant.parse(startClass);
-        ZoneId parisZone = ZoneId.of("Europe/Paris");
-        ZonedDateTime eventTimeParis = instant.atZone(parisZone);
-        ZonedDateTime notifyTimeParis = eventTimeParis.minusMinutes(advanceMinutes);
-        ZonedDateTime nowParis = ZonedDateTime.now(parisZone);
-        long delayMillis = Duration.between(nowParis, notifyTimeParis).toMillis();
-        long triggerTimeMillis = System.currentTimeMillis() + delayMillis;
-
-        Intent intent = new Intent(context, NotificationsBroadcastReceiver.class);
-        intent.putExtra("alarmOrNotification", type);
-        intent.putExtra("className", className);
-        intent.putExtra("advanceMinutes", advanceMinutes);
-        intent.putExtra("vibration", vibration);
-        intent.putExtra("triggerTime", triggerTimeMillis);
-        intent.putExtra("action", type);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                context,
-                123,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
-        );
+        Instant classStartTime = Instant.parse(startClass);
+        Instant notifyTime = classStartTime.minus(advanceMinutes, ChronoUnit.MINUTES);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
