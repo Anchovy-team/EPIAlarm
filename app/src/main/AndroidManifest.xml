@@ -55,7 +55,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="msauth"
                     android:host="anchovy.team.epialarm"
-                    android:path="/zUK0MdIxZJ0HiCGzXBE59JekqBk=" />
+                    android:path="/xxx" />
             </intent-filter>
         </activity>
     </application>
