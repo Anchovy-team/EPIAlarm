@@ -1,8 +1,8 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.zeus.models.Group;
 import androidx.lifecycle.ViewModel;
 import java.util.List;
-import anchovy.team.epialarm.zeus.models.Group;
 
 public class GroupsViewModel extends ViewModel {
     private List<Group> cachedGroups;
