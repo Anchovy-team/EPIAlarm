@@ -1,8 +1,8 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.zeus.models.Teacher;
 import androidx.lifecycle.ViewModel;
 import java.util.List;
-import anchovy.team.epialarm.zeus.models.Teacher;
 
 public class TeachersViewModel extends ViewModel {
     private List<Teacher> cachedTeachers;

@@ -33,7 +33,8 @@ public class AlarmService {
         this.gson = new Gson();
     }
 
-    public AlarmData addAlarm(String startTime, String className, int advanceMinutes, boolean vibration) {
+    public AlarmData addAlarm(String startTime, String className, int advanceMinutes,
+                              boolean vibration) {
         AlarmData alarm = new AlarmData();
         alarm.setId(UUID.randomUUID().toString());
         alarm.setStartTime(startTime);
@@ -144,7 +145,8 @@ public class AlarmService {
             if (alarmManager != null) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + delayMillis, pendingIntent);
-                Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in " + alarm.getAdvanceMinutes() + " minutes");
+                Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in "
+                        + alarm.getAdvanceMinutes() + " minutes");
             }
         } else {
             Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
@@ -160,7 +162,8 @@ public class AlarmService {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
 
         if (pendingIntent != null) {
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(
+                    Context.ALARM_SERVICE);
             if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);
                 pendingIntent.cancel();
