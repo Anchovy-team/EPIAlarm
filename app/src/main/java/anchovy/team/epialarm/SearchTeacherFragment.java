@@ -25,7 +25,8 @@ public class SearchTeacherFragment extends DialogFragment {
     private UserSession session;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_search_teacher, container, false);
 
@@ -34,7 +35,8 @@ public class SearchTeacherFragment extends DialogFragment {
         searchView.setQueryHint("Search teacher...");
 
         session = UserSession.getInstance();
-        TeachersViewModel teachersViewModel = new ViewModelProvider(requireActivity()).get(TeachersViewModel.class);
+        TeachersViewModel teachersViewModel = new ViewModelProvider(requireActivity()).get(
+                TeachersViewModel.class);
 
         if (teachersViewModel.hasCachedTeachers()) {
             allTeachers = teachersViewModel.getCachedTeachers();
@@ -87,7 +89,6 @@ public class SearchTeacherFragment extends DialogFragment {
     }
 
     private void updateTeacherListView(View view) {
-        ListView listView = view.findViewById(R.id.groupListView);
 
         teacherNames = allTeachers.stream()
                 .map(Teacher::getFullName)
@@ -96,8 +97,11 @@ public class SearchTeacherFragment extends DialogFragment {
         filteredTeachers.clear();
         filteredTeachers.addAll(teacherNames);
 
+        ListView listView = view.findViewById(R.id.groupListView);
+
         if (adapter == null) {
-            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredTeachers);
+            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1,
+                    filteredTeachers);
             listView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
@@ -111,7 +115,8 @@ public class SearchTeacherFragment extends DialogFragment {
                     .orElse(null);
 
             if (selectedTeacher != null) {
-                TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(
+                        TimetableViewModel.class);
                 viewModel.reservations = null;
                 viewModel.groupedReservations.clear();
                 session.setChosenType("teacher");

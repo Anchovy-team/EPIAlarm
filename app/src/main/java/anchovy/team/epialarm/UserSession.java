@@ -9,7 +9,8 @@ public class UserSession {
     private long teacherId;
     private String groupName;
     private String teacherName;
-    private int advanceMinutes;
+    private int advanceMinutesAlarm;
+    private int advanceMinutesReminder;
 
     private UserSession() {}
 
@@ -27,7 +28,8 @@ public class UserSession {
         groupName = null;
         teacherId = -1;
         teacherName = null;
-        advanceMinutes = -1;
+        advanceMinutesAlarm = -1;
+        advanceMinutesReminder = -1;
     }
 
     public String getToken() {
@@ -78,11 +80,19 @@ public class UserSession {
         this.teacherName = teacherName;
     }
 
-    public int getAdvanceMinutes() {
-        return advanceMinutes;
+    public int getAdvanceMinutesAlarm() {
+        return advanceMinutesAlarm;
     }
 
-    public void setAdvanceMinutes(int advanceMinutes) {
-        this.advanceMinutes = advanceMinutes;
+    public void setAdvanceMinutesAlarm(int advanceMinutesAlarm) {
+        this.advanceMinutesAlarm = advanceMinutesAlarm;
+    }
+
+    public int getAdvanceMinutesReminder() {
+        return advanceMinutesReminder;
+    }
+
+    public void setAdvanceMinutesReminder(int advanceMinutesReminder) {
+        this.advanceMinutesReminder = advanceMinutesReminder;
     }
 }
