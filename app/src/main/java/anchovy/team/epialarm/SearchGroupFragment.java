@@ -27,7 +27,8 @@ public class SearchGroupFragment extends DialogFragment {
     private UserSession session;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_search_group, container, false);
 
@@ -36,7 +37,8 @@ public class SearchGroupFragment extends DialogFragment {
         searchView.setQueryHint("Search group...");
 
         session = UserSession.getInstance();
-        GroupsViewModel groupsViewModel = new ViewModelProvider(requireActivity()).get(GroupsViewModel.class);
+        GroupsViewModel groupsViewModel = new ViewModelProvider(requireActivity()).get(
+                GroupsViewModel.class);
 
         if (groupsViewModel.hasCachedGroups()) {
             allGroups = groupsViewModel.getCachedGroups();
@@ -89,7 +91,6 @@ public class SearchGroupFragment extends DialogFragment {
     }
 
     private void updateGroupListView(View view) {
-        ListView listView = view.findViewById(R.id.groupListView);
 
         groupNames = allGroups.stream()
                 .map(Group::getName)
@@ -98,8 +99,11 @@ public class SearchGroupFragment extends DialogFragment {
         filteredGroups.clear();
         filteredGroups.addAll(groupNames);
 
+        ListView listView = view.findViewById(R.id.groupListView);
+
         if (adapter == null) {
-            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, filteredGroups);
+            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1,
+                    filteredGroups);
             listView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
@@ -113,7 +117,8 @@ public class SearchGroupFragment extends DialogFragment {
                     .orElse(null);
 
             if (selectedGroup != null) {
-                TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+                TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(
+                        TimetableViewModel.class);
                 viewModel.reservations = null;
                 viewModel.groupedReservations.clear();
                 session.setChosenType("group");
