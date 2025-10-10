@@ -26,7 +26,8 @@ jobs:
       env: 
         MSAL_HOST: ${{secrets.MSAL_HOST}}
         MSAL_PATH: ${{secrets.MSAL_PATH}}
-
       run: echo "MSAL_HOST="$MSAL_HOST"\nMSAL_PATH="$MSAL_PATH >> local.properties
+    - name: List files
+      run: ls
     - name: Build with Gradle
       run: ./gradlew build
