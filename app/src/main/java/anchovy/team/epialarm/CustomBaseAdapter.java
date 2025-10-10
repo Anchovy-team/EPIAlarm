@@ -90,7 +90,8 @@ public class CustomBaseAdapter extends BaseAdapter {
             LocalTime startTime = reservation.getStartDate().toLocalTime();
             LocalTime endTime = reservation.getEndDate().toLocalTime();
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-            String classTime = timeFormatter.format(startTime) + "\n" + timeFormatter.format(endTime);
+            String classTime = timeFormatter.format(startTime) + "\n"
+                    + timeFormatter.format(endTime);
             TextView textViewTime = convertView.findViewById(R.id.time);
             textViewTime.setText(classTime);
         }

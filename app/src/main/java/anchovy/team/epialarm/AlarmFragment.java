@@ -1,6 +1,10 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.utils.NumberPickerHelper;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,16 +13,10 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
-import androidx.work.Data;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-import anchovy.team.epialarm.utils.NumberPickerHelper;
-
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class AlarmFragment extends Fragment {
 
@@ -43,36 +41,47 @@ public class AlarmFragment extends Fragment {
         setAlarmButton.setOnClickListener(v -> {
             int advance = hourPicker.getValue() * 60 + minutePicker.getValue();
             SwitchCompat vibration = view.findViewById(R.id.vibrateSwitch);
-            session.setAdvanceMinutes(advance);
+            session.setAdvanceMinutesAlarm(advance);
              /*for (reservation : reservations_today) {
                 setAlarmNotification(reservation.time, reservation.name, advance,
                         "alarm", vibration.isChecked());
             }*/
-            setAlarmNotification("2025-09-22T23:50:00.0Z", "Advanced IAM",
+            setAlarmNotification("2025-05-28T10:00:00.0Z", "Advanced IAM",
                     advance, "alarm", vibration.isChecked());
         });
 
         return view;
     }
 
-    public void setAlarmNotification(String startClass, String className, long advanceMinutes,
+    public void setAlarmNotification(String startClass, String className, Integer advanceMinutes,
                                      String type, Boolean vibration) {
         Context context = requireContext();
 
-        Instant classStartTime = Instant.parse(startClass);
-        Instant notifyTime = classStartTime.minus(advanceMinutes, ChronoUnit.MINUTES);
+        Instant instant = Instant.parse(startClass);
+        ZoneId parisZone = ZoneId.of("Europe/Paris");
+        ZonedDateTime eventTimeParis = instant.atZone(parisZone);
+        ZonedDateTime notifyTimeParis = eventTimeParis.minusMinutes(advanceMinutes);
+        ZonedDateTime nowParis = ZonedDateTime.now(parisZone);
+        long delayMillis = Duration.between(nowParis, notifyTimeParis).toMillis();
+        long triggerTimeMillis = System.currentTimeMillis() + delayMillis;
 
-        OneTimeWorkRequest alarmWorkRequest = //set request
-                new OneTimeWorkRequest.Builder(AlarmWorker.class).setInitialDelay(Duration.between(Instant.now(), notifyTime)) //set delay
-                        .setInputData(
-                                new Data.Builder()
-                                        .putString("className", className)//set vars
-                                        .putString("type", type)
-                                        .putBoolean("vibration", vibration)
-                                        .build()
-                        )
-                        .build();
-        WorkManager.getInstance(context)
-                .enqueueUniqueWork("setAlarm", ExistingWorkPolicy.REPLACE, alarmWorkRequest);//execute
+        Intent intent = new Intent(context, NotificationsBroadcastReceiver.class);
+        intent.putExtra("alarmOrNotification", type);
+        intent.putExtra("className", className);
+        intent.putExtra("advanceMinutes", advanceMinutes);
+        intent.putExtra("vibration", vibration);
+        intent.putExtra("triggerTime", triggerTimeMillis);
+        intent.putExtra("action", type);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                123,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent);
     }
 }
