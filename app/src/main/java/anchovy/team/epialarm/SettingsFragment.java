@@ -31,7 +31,8 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         connectionStatus = view.findViewById(R.id.connection_status);
@@ -99,8 +100,8 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     }
 
     private void updateUi() {
-        boolean isLoggedIn = authService.getmAccount() != null;
-        int visibility = (isLoggedIn ? View.VISIBLE : View.GONE);
+        boolean isLoggedIn = session.getToken() != null;
+        int visibility = isLoggedIn ? View.VISIBLE : View.GONE;
         searchGroupButton.setVisibility(visibility);
         searchTeacherButton.setVisibility(visibility);
         currentGroup.setVisibility(visibility);
@@ -126,7 +127,8 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     @Override
     public void onSignedOut() {
         session.clear();
-        TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+        TimetableViewModel viewModel = new ViewModelProvider(requireActivity()).get(
+                TimetableViewModel.class);
         viewModel.reservations = null;
         viewModel.groupedReservations.clear();
         updateUi();
