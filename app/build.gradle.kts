@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.ext.junit)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.firebase.perf)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -92,4 +93,5 @@ dependencies {
 
     implementation ("com.microsoft.identity.client:msal:5.1.0")
     implementation ("com.android.volley:volley:1.2.1")
+    implementation ("androidx.work:work-runtime:2.10.4")
 }
