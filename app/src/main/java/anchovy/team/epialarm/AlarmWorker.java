@@ -1,21 +1,12 @@
 package anchovy.team.epialarm;
 
-import static android.os.VibrationEffect.createOneShot;
-import static android.os.VibrationEffect.createPredefined;
-import static androidx.core.content.ContentProviderCompat.requireContext;
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.provider.Settings;
-import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
