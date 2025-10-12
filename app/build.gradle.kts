@@ -19,14 +19,14 @@ plugins {
 }
 
 android {
-    /*signingConfigs {
+    signingConfigs {
         create("release") {
             storeFile = keyStoreProperties["storeFile"]?.let { file(it as String) }
             storePassword = keyStoreProperties["storePassword"] as String?
             keyAlias = keyStoreProperties["keyAlias"] as String?
             keyPassword = keyStoreProperties["keyPassword"] as String?
         }
-    }*/
+    }
 
     namespace = "anchovy.team.epialarm"
     compileSdk = 35
