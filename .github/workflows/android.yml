@@ -22,6 +22,11 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Set up auth config
+      env:
+        AUTH_CONFIG: ${{secrets.AUTH_CONFIG}}
+      run:
+        echo "$AUTH_CONFIG" > app/src/main/res/raw/auth_config_single_account.json
     - name: Set up env
       env:
           MSAL_HOST: ${{secrets.MSAL_HOST}}
@@ -29,7 +34,5 @@ jobs:
       run: |
           echo "MSAL_HOST=$MSAL_HOST" >> local.properties
           echo "MSAL_PATH=$MSAL_PATH" >> local.properties
-    - name: Cat files
-      run: cat local.properties
     - name: Build with Gradle
       run: ./gradlew build
