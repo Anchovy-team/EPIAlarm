@@ -50,7 +50,7 @@ android {
         viewBinding = true
     }
 
-    buildTypes {
+    /*buildTypes {
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
@@ -62,7 +62,7 @@ android {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
-    }
+    }*/
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
