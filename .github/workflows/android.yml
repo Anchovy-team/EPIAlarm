@@ -22,8 +22,6 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Make dir
-      run: mkdir app/src/main/res/raw
     - name: Set up auth config
       env:
         AUTH_CONFIG: ${{secrets.AUTH_CONFIG}}

@@ -6,5 +6,5 @@ keystore.properties
 build
 app/src/main/assets/env
 .vscode
-app/src/main/res/raw/
+app/src/main/res/raw/auth_config_single_account.json
 app/release/
