@@ -19,14 +19,14 @@ plugins {
 }
 
 android {
-    signingConfigs {
+    /*signingConfigs {
         create("release") {
             storeFile = keyStoreProperties["storeFile"]?.let { file(it as String) }
             storePassword = keyStoreProperties["storePassword"] as String?
             keyAlias = keyStoreProperties["keyAlias"] as String?
             keyPassword = keyStoreProperties["keyPassword"] as String?
         }
-    }
+    }*/
 
     namespace = "anchovy.team.epialarm"
     compileSdk = 35
@@ -40,7 +40,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        signingConfig = signingConfigs.getByName("release")
+        //signingConfig = signingConfigs.getByName("release")
 
         manifestPlaceholders["msalHost"] = localProperties.getProperty("MSAL_HOST")
         manifestPlaceholders["msalPath"] = localProperties.getProperty("MSAL_PATH")
@@ -50,7 +50,7 @@ android {
         viewBinding = true
     }
 
-    buildTypes {
+    /*buildTypes {
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
@@ -62,7 +62,7 @@ android {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
-    }
+    }*/
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
