@@ -29,6 +29,17 @@ jobs:
         echo "$AUTH_CONFIG" > app/src/main/res/raw/auth_config_single_account.json
     - name: Set up env
       env:
+          KEY_ALIAS: ${{secrets.KEY_ALIAS}}
+          KEY_PASSWORD: ${{secrets.KEY_PASSWORD}}
+          STORE_PASSWORD: ${{secrets.STORE_PASSWORD}}
+          STRORE_FILE: ${{secrets.STRORE_FILE}}
+      run: |
+          echo "keyAlias=$KEY_ALIAS" >> local.properties
+          echo "keyPassword=$KEY_PASSWORD" >> local.properties
+          echo "storePassword=$STORE_PASSWORD" >> local.properties
+          echo "storeFile=$STRORE_FILE" >> local.properties
+    - name: Set up keystore
+      env:
           MSAL_HOST: ${{secrets.MSAL_HOST}}
           MSAL_PATH: ${{secrets.MSAL_PATH}}
       run: |
