@@ -79,26 +79,21 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Today's scheduled alarms and reminders"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:layout_marginBottom="12dp" />
-
-        <ListView
-            android:id="@+id/todayEventsList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:dividerHeight="8dp"
-            android:layout_marginBottom="32dp" />
-
         <Button
             android:id="@+id/saveSettingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save Settings" />
+
+        <Button
+            android:id="@+id/openAlarmsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Scheduled Alarms"
+            android:textAllCaps="false"
+            android:backgroundTint="#1E63FF"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="12dp" />
+
     </LinearLayout>
 </ScrollView>
