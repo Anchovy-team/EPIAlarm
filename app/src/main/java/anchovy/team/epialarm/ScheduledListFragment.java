@@ -1,6 +1,5 @@
 package anchovy.team.epialarm;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,15 +46,16 @@ public class ScheduledListFragment extends Fragment {
         if (viewModel.reservations != null && !viewModel.reservations.isEmpty()) {
             LocalDate today = LocalDate.now(zone);
 
-            List<Reservation> todayList = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                todayList = viewModel.reservations.stream()
-                        .filter(r -> r.getStartDate().toLocalDate().equals(today))
-                        .sorted(Comparator.comparing(Reservation::getStartDate))
-                        .toList();
+            List<Reservation> todayList = new ArrayList<>();
+            for (Reservation r : viewModel.reservations) {
+                if (r.getStartDate().toLocalDate().equals(today)) {
+                    todayList.add(r);
+                }
             }
 
-            if (todayList == null) {
+            todayList.sort(Comparator.comparing(Reservation::getStartDate));
+
+            if (!todayList.isEmpty()) {
                 UserSession session = UserSession.getInstance();
 
                 for (int i = 0; i < todayList.size(); i++) {
@@ -65,8 +65,11 @@ public class ScheduledListFragment extends Fragment {
                             ? session.getAdvanceMinutesAlarm()
                             : session.getAdvanceMinutesReminder();
 
-                    String triggerTime = r.getStartDate().minusMinutes(advance).atZone(zone)
-                            .toLocalTime().format(fmt);
+                    String triggerTime = r.getStartDate()
+                            .minusMinutes(advance)
+                            .atZone(zone)
+                            .toLocalTime()
+                            .format(fmt);
 
                     Map<String, String> row = new HashMap<>();
                     row.put("title", r.getName());
