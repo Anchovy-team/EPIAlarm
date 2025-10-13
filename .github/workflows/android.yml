@@ -31,18 +31,17 @@ jobs:
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         STRORE_FILE: ${{secrets.STRORE_FILE}}
-      run: echo "$KEYSTORE_BASE64" | base64 --decode > "$STRORE_FILE"
+      run: echo "$KEYSTORE_BASE64" | base64 --decode > debug-key.jks
     - name: Set up keystore
       env:
           KEY_ALIAS: ${{secrets.KEY_ALIAS}}
           KEY_PASSWORD: ${{secrets.KEY_PASSWORD}}
           STORE_PASSWORD: ${{secrets.STORE_PASSWORD}}
-          STRORE_FILE: ${{secrets.STRORE_FILE}}
       run: |
           echo "keyAlias=$KEY_ALIAS" > keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
           echo "storePassword=$STORE_PASSWORD" >> keystore.properties
-          echo "storeFile=$STRORE_FILE" >> keystore.properties
+          echo "storeFile=debug-key.jks" >> keystore.properties
     - name: Set up env
       env:
           MSAL_HOST: ${{secrets.MSAL_HOST}}
