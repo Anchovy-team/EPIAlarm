@@ -43,7 +43,7 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" > keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
           echo "storePassword=$STORE_PASSWORD" >> keystore.properties
-          echo "storeFile=/~/debug-key.jks" >> keystore.properties
+          echo "storeFile=debug-key.jks" >> keystore.properties
     - name: Set up env
       env:
           MSAL_HOST: ${{secrets.MSAL_HOST}}
