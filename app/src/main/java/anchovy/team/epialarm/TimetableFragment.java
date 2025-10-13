@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -64,7 +63,7 @@ public class TimetableFragment extends Fragment {
         if (viewModel.reservations != null && !viewModel.reservations.isEmpty()) {
             reservationsGrouped = viewModel.groupedReservations;
             reservations = viewModel.reservations;
-            loadData(view);
+            loadData();
         }
 
         if (session.getToken() == null) {
@@ -89,7 +88,7 @@ public class TimetableFragment extends Fragment {
             reservationService = new ReservationService(clientService);
             reservationsGrouped = new TreeMap<>();
             LocalDateTime today = LocalDate.now().atStartOfDay();
-            LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(4);
+            LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(1);
 
             if ("group".equals(session.getChosenType())) {
 
@@ -97,16 +96,12 @@ public class TimetableFragment extends Fragment {
                 groups.add(session.getGroupId());
 
                 reservationService.getReservationsByFilter(groups, new ArrayList<>(),
-                        new ArrayList<>(),
-                        today, oneWeekForward).thenAccept(reservations1 -> {
-                            reservations = reservations1;
-                            requireActivity().runOnUiThread(() -> {
-                                setReservations(reservations, view);
-                            });
-                        }).exceptionally(ex -> {
+                                new ArrayList<>(), today, oneWeekForward)
+                        .thenAccept(res -> requireActivity().runOnUiThread(() ->
+                                setReservations(reservations = res)))
+                        .exceptionally(ex -> {
                             ex.printStackTrace();
-                            return null;
-                        });
+                            return null; });
 
             } else if ("teacher".equals(session.getChosenType())) {
 
@@ -114,28 +109,24 @@ public class TimetableFragment extends Fragment {
                 teachers.add(session.getTeacherId());
 
                 reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
-                        teachers, today, oneWeekForward).thenAccept(reservations1 -> {
-                            reservations = reservations1;
-                            requireActivity().runOnUiThread(() -> {
-                                setReservations(reservations, view);
-                            });
-                        }).exceptionally(ex -> {
+                                teachers, today, oneWeekForward)
+                        .thenAccept(res -> requireActivity().runOnUiThread(() ->
+                                setReservations(reservations = res)))
+                        .exceptionally(ex -> {
                             ex.printStackTrace();
                             return null;
                         });
+
             }
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Object itemRead = parent.getItemAtPosition(position);
-                    if (itemRead instanceof DateHeaderItem) {
-                        return;
-                    }
-                    ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
-                            position);
-                    openClassInfo(reservationItem.getReservation());
+            listView.setOnItemClickListener((parent, view1, position, id) -> {
+                Object itemRead = parent.getItemAtPosition(position);
+                if (itemRead instanceof DateHeaderItem) {
+                    return;
                 }
+                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
+                        position);
+                openClassInfo(reservationItem.getReservation());
             });
         }
     }
@@ -145,7 +136,7 @@ public class TimetableFragment extends Fragment {
         super.onResume();
     }
 
-    public void loadData(View view) {
+    public void loadData() {
         if (isAdded() && getContext() != null) {
             CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(),
                     reservationsGrouped);
@@ -160,7 +151,7 @@ public class TimetableFragment extends Fragment {
         }
     }
 
-    public void setReservations(List<Reservation> reservations, View view) {
+    public void setReservations(List<Reservation> reservations) {
         if (reservations == null) {
             return;
         }
@@ -180,7 +171,7 @@ public class TimetableFragment extends Fragment {
         viewModel.reservations = reservations;
         viewModel.groupedReservations = reservationsGrouped;
 
-        loadData(view);
+        loadData();
     }
 
     private void openClassInfo(Reservation item) {
