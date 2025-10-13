@@ -1,0 +1,89 @@
+package anchovy.team.epialarm;
+
+import android.os.Build;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import anchovy.team.epialarm.zeus.models.Reservation;
+
+public class ScheduledListFragment extends Fragment {
+
+    private ListView scheduledList;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_scheduled_list, container, false);
+        scheduledList = v.findViewById(R.id.scheduledList);
+        loadScheduled();
+        return v;
+    }
+
+    private void loadScheduled() {
+        TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
+                .get(TimetableViewModel.class);
+
+        ZoneId zone = ZoneId.of("Europe/Paris");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm");
+
+        List<Map<String, String>> data = new ArrayList<>();
+
+        if (viewModel.reservations != null && !viewModel.reservations.isEmpty()) {
+            LocalDate today = LocalDate.now(zone);
+
+            List<Reservation> todayList = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                todayList = viewModel.reservations.stream()
+                        .filter(r -> r.getStartDate().toLocalDate().equals(today))
+                        .sorted(Comparator.comparing(Reservation::getStartDate))
+                        .toList();
+            }
+
+            if (todayList == null) {
+                UserSession session = UserSession.getInstance();
+
+                for (int i = 0; i < todayList.size(); i++) {
+                    Reservation r = todayList.get(i);
+                    boolean isAlarm = (i == 0);
+                    int advance = isAlarm
+                            ? session.getAdvanceMinutesAlarm()
+                            : session.getAdvanceMinutesReminder();
+
+                    String triggerTime = r.getStartDate().minusMinutes(advance).atZone(zone)
+                            .toLocalTime().format(fmt);
+
+                    Map<String, String> row = new HashMap<>();
+                    row.put("title", r.getName());
+                    row.put("time", triggerTime + " • " + (isAlarm ? "Alarm" : "Reminder"));
+                    row.put("type", isAlarm ? "Alarm" : "Reminder");
+                    data.add(row);
+                }
+            }
+        }
+
+        SimpleAdapter adapter = new SimpleAdapter(
+                requireContext(),
+                data,
+                R.layout.item_today_event,
+                new String[]{"title", "time", "type"},
+                new int[]{R.id.eventTitle, R.id.eventTime, R.id.eventType}
+        );
+        scheduledList.setAdapter(adapter);
+    }
+}

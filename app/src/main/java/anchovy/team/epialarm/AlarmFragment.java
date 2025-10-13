@@ -1,39 +1,39 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.utils.NumberPickerHelper;
+import anchovy.team.epialarm.zeus.models.Reservation;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.List;
 
 public class AlarmFragment extends Fragment {
 
     private UserSession session;
     private NumberPicker hourPicker;
     private NumberPicker minutePicker;
-    private RadioGroup modeRadioGroup;
     private RadioButton radioAlarm;
-    private RadioButton radioReminder;
-    private int alarmAdvanceMinutes;
-    private int reminderAdvanceMinutes;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,95 +44,120 @@ public class AlarmFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_alarm, container, false);
+        View v = inflater.inflate(R.layout.fragment_alarm, container, false);
 
-        hourPicker = view.findViewById(R.id.hourPicker);
-        minutePicker = view.findViewById(R.id.minutePicker);
-        modeRadioGroup = view.findViewById(R.id.modeRadioGroup);
-        radioAlarm = view.findViewById(R.id.radioAlarm);
-        radioReminder = view.findViewById(R.id.radioReminder);
-        ListView todayEventsList = view.findViewById(R.id.todayEventsList);
+        hourPicker = v.findViewById(R.id.hourPicker);
+        minutePicker = v.findViewById(R.id.minutePicker);
+        RadioGroup modeGroup = v.findViewById(R.id.modeRadioGroup);
+        radioAlarm = v.findViewById(R.id.radioAlarm);
 
         NumberPickerHelper.configureHourPicker(hourPicker);
         NumberPickerHelper.configureMinutePicker(minutePicker);
 
-        alarmAdvanceMinutes = session.getAdvanceMinutesAlarm();
-        reminderAdvanceMinutes = session.getAdvanceMinutesReminder();
+        updatePickersFromAdvance(session.getAdvanceMinutesAlarm());
 
-        updatePickersFromAdvance(alarmAdvanceMinutes);
-
-        modeRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.radioAlarm) {
-                updatePickersFromAdvance(alarmAdvanceMinutes);
-            } else if (checkedId == R.id.radioReminder) {
-                updatePickersFromAdvance(reminderAdvanceMinutes);
-            }
+        modeGroup.setOnCheckedChangeListener((group, id) -> {
+            int mins = id == R.id.radioAlarm
+                    ? session.getAdvanceMinutesAlarm()
+                    : session.getAdvanceMinutesReminder();
+            updatePickersFromAdvance(mins);
         });
 
-        Button saveSettingsButton = view.findViewById(R.id.saveSettingsButton);
-        saveSettingsButton.setOnClickListener(v -> {
-            int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
+        //setAlarm("2025-10-13T22:00:00.0Z", "JS 1");
+        //setNotification("2025-10-13T22:00:00.0Z", "JS 2 PRO");
 
-            if (radioAlarm.isChecked()) {
-                alarmAdvanceMinutes = totalMinutes;
-                session.setAdvanceMinutesAlarm(totalMinutes);
-            } else {
-                reminderAdvanceMinutes = totalMinutes;
-                session.setAdvanceMinutesReminder(totalMinutes);
-            }
-            //TODO: auto set
-            //setAlarm(...);
-            setAlarm("2025-10-13T20:00:00.0Z", "JS 1");
-            setNotification("2025-10-13T20:00:00.0Z", "JS 2 PRO");
-            /*for (reservation : other_reservations_today)
-                setNotification(reservation.time, reservation.name);*/
-            //TODO: todayEventsList
-            //TODO: userSession clears after closing the app
-        });
+        v.findViewById(R.id.saveSettingsButton).setOnClickListener(btn -> onSaveClicked());
+        v.findViewById(R.id.openAlarmsButton).setOnClickListener(view -> openScheduledList());
+        return v;
+    }
 
-        return view;
+    private void onSaveClicked() {
+        int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
+        boolean alarmMode = radioAlarm.isChecked();
+
+        if (alarmMode) {
+            session.setAdvanceMinutesAlarm(totalMinutes);
+        } else {
+            session.setAdvanceMinutesReminder(totalMinutes);
+        }
+
+        scheduleTodayEvents();
+    }
+
+    private void scheduleTodayEvents() {
+        var viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
+        if (viewModel.reservations == null || viewModel.reservations.isEmpty()) return;
+
+        ZoneId zone = ZoneId.of("Europe/Paris");
+        LocalDate today = LocalDate.now(zone);
+
+        List<Reservation> todayList = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            todayList = viewModel.reservations.stream()
+                    .filter(r -> r.getStartDate().toLocalDate().equals(today))
+                    .sorted(Comparator.comparing(Reservation::getStartDate))
+                    .toList();
+        }
+
+        if (todayList == null) {
+            return;
+        }
+
+        Reservation first = todayList.get(0);
+        setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
+
+        todayList.stream().skip(1)
+                .forEach(r -> setNotification(
+                        r.getStartDate().atZone(zone).toInstant().toString(),
+                        r.getName()));
+    }
+
+    private void openScheduledList() {
+        getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, new ScheduledListFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void updatePickersFromAdvance(int totalMinutes) {
-        int hours = totalMinutes / 60;
-        int minutes = totalMinutes % 60;
-        hourPicker.setValue(hours);
-        minutePicker.setValue(minutes);
+        hourPicker.setValue(totalMinutes / 60);
+        minutePicker.setValue(totalMinutes % 60);
     }
 
-    public void setAlarm(String startClass, String className) {
+    private void setAlarm(String startTimeIso, String className) {
         Context ctx = requireContext();
+        int advance = session.getAdvanceMinutesAlarm();
 
-        Duration delay = Duration.between(Instant.now(), Instant.parse(startClass)
-                .minus(session.getAdvanceMinutesAlarm(), ChronoUnit.MINUTES));
+        Duration delay = Duration.between(Instant.now(), Instant.parse(startTimeIso).minus(advance,
+                ChronoUnit.MINUTES));
+
         OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(AlarmWorker.class)
                 .setInitialDelay(delay.isNegative() ? Duration.ZERO : delay)
-                .setInputData(new Data.Builder().putString("className", className).build())
+                .setInputData(new Data.Builder()
+                        .putString("className", className)
+                        .putInt("advance", advance)
+                        .build())
                 .build();
 
         WorkManager.getInstance(ctx).enqueueUniqueWork("setAlarm", ExistingWorkPolicy.REPLACE, req);
     }
 
-    public void setNotification(String startClass, String className) {
+    private void setNotification(String startTimeIso, String className) {
         Context ctx = requireContext();
         int advance = session.getAdvanceMinutesReminder();
 
-        long triggerTime = Instant.parse(startClass)
-                .atZone(ZoneId.of("Europe/Paris"))
-                .minusMinutes(advance)
-                .toInstant()
-                .toEpochMilli();
+        long triggerAt = Instant.parse(startTimeIso).atZone(ZoneId.of("Europe/Paris"))
+                .minusMinutes(advance).toInstant().toEpochMilli();
 
-        Intent intent = new Intent(getContext(), NotificationsBroadcastReceiver.class);
-        intent.putExtra("className", className);
-        intent.putExtra("advance", advance);
+        Intent i = new Intent(ctx, NotificationsBroadcastReceiver.class)
+                .putExtra("className", className)
+                .putExtra("advance", advance);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                ctx, 123, intent,
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
-        );
+        PendingIntent pi = PendingIntent.getBroadcast(ctx, 123, i,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-        AlarmManager alarmManager = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+        ((AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE))
+                .setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 }
