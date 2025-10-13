@@ -19,14 +19,14 @@ plugins {
 }
 
 android {
-    signingConfigs {
+    /*signingConfigs {
         create("release") {
             storeFile = keyStoreProperties["storeFile"]?.let { file(it as String) }
             storePassword = keyStoreProperties["storePassword"] as String?
             keyAlias = keyStoreProperties["keyAlias"] as String?
             keyPassword = keyStoreProperties["keyPassword"] as String?
         }
-    }
+    }*/
 
     namespace = "anchovy.team.epialarm"
     compileSdk = 35
@@ -40,7 +40,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        signingConfig = signingConfigs.getByName("release")
+        //signingConfig = signingConfigs.getByName("release")
 
         manifestPlaceholders["msalHost"] = localProperties.getProperty("MSAL_HOST")
         manifestPlaceholders["msalPath"] = localProperties.getProperty("MSAL_PATH")
@@ -50,7 +50,7 @@ android {
         viewBinding = true
     }
 
-    buildTypes {
+    /*buildTypes {
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
@@ -62,7 +62,7 @@ android {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
-    }
+    }*/
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.ext.junit)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.firebase.perf)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -92,4 +93,5 @@ dependencies {
 
     implementation ("com.microsoft.identity.client:msal:5.1.0")
     implementation ("com.android.volley:volley:1.2.1")
+    implementation ("androidx.work:work-runtime:2.10.4")
 }
