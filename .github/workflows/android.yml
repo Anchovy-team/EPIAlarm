@@ -31,7 +31,7 @@ jobs:
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         STRORE_FILE: ${{secrets.STRORE_FILE}}
-      run: echo "$KEYSTORE_BASE64" | base64 --decode > $STORE_FILE
+      run: echo "$KEYSTORE_BASE64" | base64 --decode > "$STORE_FILE"
     - name: Set up keystore
       env:
           KEY_ALIAS: ${{secrets.KEY_ALIAS}}
