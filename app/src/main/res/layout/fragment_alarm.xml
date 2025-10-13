@@ -1,83 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:gravity="center"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="#FFFFFF">
-
-    <TextView
-        android:id="@+id/config_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/config_title"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
-        android:layout_marginBottom="8dp"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:id="@+id/config_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/config_description"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="24dp"
-        android:layout_gravity="center"
-        android:textAlignment="center" />
+    android:background="#FFFFFF"
+    android:padding="24dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <NumberPicker
-            android:id="@+id/hourPicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp" />
-
-        <NumberPicker
-            android:id="@+id/minutePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="24dp"
-        android:gravity="center_vertical">
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp">
 
         <TextView
-            android:id="@+id/vibrateLabel"
+            android:id="@+id/config_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/vibrate_label"
-            android:textSize="16sp"
+            android:text="Alarm Configuration"
+            android:textSize="24sp"
+            android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginBottom="12dp" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/vibrateSwitch"
-            style="@style/Widget.EpiAlarm.Switch"
+        <TextView
+            android:id="@+id/config_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="48dp" />
-    </LinearLayout>
+            android:text="Set advance times before lessons: alarm for the first one, reminder for the rest."
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="32dp"
+            android:textAlignment="center" />
 
-    <Button
-        android:id="@+id/SetAlarmButton"
-        style="@style/Widget.EpiAlarm.PlatformButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/set_alarm"
-        android:layout_marginTop="32dp"/>
-</LinearLayout>
+        <RadioGroup
+            android:id="@+id/modeRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="28dp">
+
+            <RadioButton
+                android:id="@+id/radioAlarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alarm"
+                android:checked="true"
+                android:layout_marginEnd="32dp"
+                app:buttonTint="#1E63FF"
+                android:textColor="@android:color/black" />
+
+            <RadioButton
+                android:id="@+id/radioReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reminder"
+                app:buttonTint="#1E63FF"
+                android:textColor="@android:color/black" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="28dp">
+
+            <NumberPicker
+                android:id="@+id/hourPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp" />
+
+            <NumberPicker
+                android:id="@+id/minutePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Today's scheduled alarms and reminders"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="12dp" />
+
+        <ListView
+            android:id="@+id/todayEventsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="8dp"
+            android:layout_marginBottom="32dp" />
+
+        <Button
+            android:id="@+id/saveSettingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Settings" />
+    </LinearLayout>
+</ScrollView>

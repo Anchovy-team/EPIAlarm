@@ -36,9 +36,7 @@ public class CustomBaseAdapter extends BaseAdapter {
             displayList.add(new DateHeaderItem(entry.getKey()));
             entry.getValue().stream()
                     .sorted(Comparator.comparing(Reservation::getStartDate))
-                    .forEach(r -> {
-                        displayList.add(new ReservationItem(r));
-                    });
+                    .forEach(r -> displayList.add(new ReservationItem(r)));
         }
     }
 

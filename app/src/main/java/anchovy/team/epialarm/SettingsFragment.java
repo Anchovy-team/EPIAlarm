@@ -55,9 +55,7 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
         super.onViewCreated(view, savedInstanceState);
 
         getParentFragmentManager().setFragmentResultListener(
-                "closed", getViewLifecycleOwner(), (requestKey, bundle) -> {
-                    updateUi();
-                });
+                "closed", getViewLifecycleOwner(), (requestKey, bundle) -> updateUi());
     }
 
     @Override
@@ -69,28 +67,22 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     private void initializeUi() {
         AuthResultHandler handler = this;
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (authService.getmAccount() == null) {
-                    authService.signIn(requireActivity(), handler);
-                } else {
-                    authService.signOut(handler);
-                }
+        loginButton.setOnClickListener(v -> {
+            if (authService.getmAccount() == null) {
+                authService.signIn(requireActivity(), handler);
+            } else {
+                authService.signOut(handler);
             }
         });
 
-        searchGroupButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SearchGroupFragment dialog = new SearchGroupFragment();
-                dialog.show(getParentFragmentManager(), "searchDialog");
-            }
+        searchGroupButton.setOnClickListener(v -> {
+            SearchGroupFragment dialog = new SearchGroupFragment();
+            dialog.show(getParentFragmentManager(), "searchDialog");
         });
 
-        searchTeacherButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                SearchTeacherFragment dialog = new SearchTeacherFragment();
-                dialog.show(getParentFragmentManager(), "searchDialog");
-            }
+        searchTeacherButton.setOnClickListener(v -> {
+            SearchTeacherFragment dialog = new SearchTeacherFragment();
+            dialog.show(getParentFragmentManager(), "searchDialog");
         });
 
         sourceCodeButton.setOnClickListener(v -> {
@@ -111,9 +103,9 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
 
         if (isLoggedIn) {
             if ("group".equals(session.getChosenType())) {
-                currentGroup.setText("Chosen Group: " + session.getGroupName());
+                currentGroup.setText(String.format("Chosen Group: %s", session.getGroupName()));
             } else if ("teacher".equals(session.getChosenType())) {
-                currentGroup.setText("Chosen Teacher: " + session.getTeacherName());
+                currentGroup.setText(String.format("Chosen Teacher: %s", session.getTeacherName()));
             }
         }
     }
