@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="#EE212121"
+    android:padding="16dp"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Introduction to IAM"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:layout_marginBottom="4dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textCountdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="In 60 minutes"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnPostpone"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="POSTPONE"
+            android:layout_marginEnd="12dp" />
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="CLOSE" />
+    </LinearLayout>
+</LinearLayout>
