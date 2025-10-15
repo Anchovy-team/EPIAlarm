@@ -1,5 +1,6 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.zeus.models.Reservation;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import anchovy.team.epialarm.zeus.models.Reservation;
 
 public class ScheduledListFragment extends Fragment {
 
@@ -60,7 +60,7 @@ public class ScheduledListFragment extends Fragment {
 
                 for (int i = 0; i < todayList.size(); i++) {
                     Reservation r = todayList.get(i);
-                    boolean isAlarm = (i == 0);
+                    boolean isAlarm = i == 0;
                     int advance = isAlarm
                             ? session.getAdvanceMinutesAlarm()
                             : session.getAdvanceMinutesReminder();

@@ -122,7 +122,9 @@ public class AlarmOverlayService extends Service {
                 .withEndAction(() -> {
                     try {
                         windowManager.removeViewImmediate(overlayView);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                        throw new RuntimeException();
+                    }
                     overlayView = null;
                     if (postpone && className != null) {
                         scheduleWorker(className, postponeTime);
@@ -138,7 +140,9 @@ public class AlarmOverlayService extends Service {
                 if (player.isPlaying()) {
                     player.stop();
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                throw new RuntimeException();
+            }
             player.release();
             player = null;
         }

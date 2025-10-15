@@ -48,7 +48,6 @@ public class AlarmFragment extends Fragment {
 
         hourPicker = v.findViewById(R.id.hourPicker);
         minutePicker = v.findViewById(R.id.minutePicker);
-        RadioGroup modeGroup = v.findViewById(R.id.modeRadioGroup);
         radioAlarm = v.findViewById(R.id.radioAlarm);
 
         NumberPickerHelper.configureHourPicker(hourPicker);
@@ -56,6 +55,7 @@ public class AlarmFragment extends Fragment {
 
         updatePickersFromAdvance(session.getAdvanceMinutesAlarm());
 
+        RadioGroup modeGroup = v.findViewById(R.id.modeRadioGroup);
         modeGroup.setOnCheckedChangeListener((group, id) -> {
             int mins = id == R.id.radioAlarm
                     ? session.getAdvanceMinutesAlarm()
@@ -86,7 +86,9 @@ public class AlarmFragment extends Fragment {
 
     private void scheduleTodayEvents() {
         var viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-        if (viewModel.reservations == null || viewModel.reservations.isEmpty()) return;
+        if (viewModel.reservations == null || viewModel.reservations.isEmpty()) {
+            return;
+        }
 
         ZoneId zone = ZoneId.of("Europe/Paris");
         LocalDate today = LocalDate.now(zone);
