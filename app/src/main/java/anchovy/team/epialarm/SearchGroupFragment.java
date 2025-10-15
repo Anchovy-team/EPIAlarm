@@ -44,9 +44,8 @@ public class SearchGroupFragment extends DialogFragment {
             allGroups = groupsViewModel.getCachedGroups();
             updateGroupListView(view);
         } else {
-            clientService.authenticate(session.getToken()).thenAccept(authToken -> {
-                fetchAndCacheGroups(view, groupsViewModel);
-            });
+            clientService.authenticate(session.getToken()).thenAccept(authToken ->
+                    fetchAndCacheGroups(view, groupsViewModel));
         }
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -136,9 +135,7 @@ public class SearchGroupFragment extends DialogFragment {
         groupsService.getAllGroups().thenAccept(groups -> {
             allGroups = groups;
             groupsViewModel.setCachedGroups(groups);
-            requireActivity().runOnUiThread(() -> {
-                updateGroupListView(view);
-            });
+            requireActivity().runOnUiThread(() -> updateGroupListView(view));
         }).exceptionally(ex -> {
             ex.printStackTrace();
             return null;

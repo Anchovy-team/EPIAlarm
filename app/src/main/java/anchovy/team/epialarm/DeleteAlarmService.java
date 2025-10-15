@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AlarmService {
+public class DeleteAlarmService {
     private static final String TAG = "AlarmService";
     private static final String PREF_NAME = "alarms_pref";
     private static final String ALARMS_KEY = "alarms_list";
@@ -27,7 +27,7 @@ public class AlarmService {
     private final SharedPreferences sharedPreferences;
     private final Gson gson;
 
-    public AlarmService(Context context) {
+    public DeleteAlarmService(Context context) {
         this.context = context;
         this.sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         this.gson = new Gson();
