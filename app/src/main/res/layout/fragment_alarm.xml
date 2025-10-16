@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/background_primary"
     android:paddingTop="24dp"
     android:paddingStart="24dp"
     android:paddingEnd="24dp">
@@ -22,7 +22,7 @@
             android:text="Alarm Configuration"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="Set advance times before lessons: alarm for the first one, reminder for the rest."
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="@color/text_tertiary"
             android:layout_marginBottom="32dp"
             android:textAlignment="center" />
 
@@ -44,7 +44,7 @@
             android:layout_marginEnd="32dp"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="#FFFFFF">
+            app:cardBackgroundColor="@color/card_background">
 
             <RadioGroup
                 android:id="@+id/modeRadioGroup"
@@ -64,8 +64,8 @@
                     android:layout_marginEnd="8dp"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/black"
-                    app:buttonTint="#1E63FF" />
+                    android:textColor="@color/text_primary"
+                    app:buttonTint="@color/accent_primary" />
 
                 <RadioButton
                     android:id="@+id/radioReminder"
@@ -76,8 +76,8 @@
                     android:layout_marginStart="8dp"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/black"
-                    app:buttonTint="#1E63FF" />
+                    android:textColor="@color/text_primary"
+                    app:buttonTint="@color/accent_primary" />
             </RadioGroup>
 
         </androidx.cardview.widget.CardView>
@@ -91,7 +91,7 @@
             android:layout_marginEnd="32dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
-            app:cardBackgroundColor="#F8F9FA">
+            app:cardBackgroundColor="@color/surface_primary">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -113,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:text="Hours"
                         android:textSize="14sp"
-                        android:textColor="#8E8E93"
+                        android:textColor="@color/text_tertiary"
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
@@ -122,7 +122,7 @@
                         android:layout_width="120dp"
                         android:layout_height="160dp"
                         android:textSize="32sp"
-                        android:textColor="#000000" />
+                        android:textColor="@color/text_primary" />
 
                 </LinearLayout>
 
@@ -132,7 +132,7 @@
                     android:layout_height="wrap_content"
                     android:text=":"
                     android:textSize="32sp"
-                    android:textColor="#8E8E93"
+                    android:textColor="@color/text_tertiary"
                     android:textStyle="bold"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp" />
@@ -150,7 +150,7 @@
                         android:layout_height="wrap_content"
                         android:text="Minutes"
                         android:textSize="14sp"
-                        android:textColor="#8E8E93"
+                        android:textColor="@color/text_tertiary"
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
@@ -159,7 +159,7 @@
                         android:layout_width="120dp"
                         android:layout_height="160dp"
                         android:textSize="32sp"
-                        android:textColor="#000000" />
+                        android:textColor="@color/text_primary" />
 
                 </LinearLayout>
 
@@ -183,7 +183,7 @@
                 android:text="Save Settings"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textColor="@color/text_primary"
                 android:background="@drawable/button_primary_background"
                 android:layout_marginBottom="12dp" />
 
@@ -194,7 +194,7 @@
                 android:text="View Scheduled Alarms"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                android:textColor="#1E63FF"
+                android:textColor="@color/accent_primary"
                 android:background="@drawable/button_secondary_background"
                 android:textAllCaps="false" />
 

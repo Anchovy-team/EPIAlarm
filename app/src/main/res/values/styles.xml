@@ -15,7 +15,7 @@
     </style>
 
     <style name="Widget.EpiAlarm.PlatformButton" parent="@android:style/Widget.Material.Button">
-        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:background">@drawable/btn_primary_bg</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
@@ -28,7 +28,7 @@
         <item name="android:textAppearance">@style/TextAppearance.EpiAlarm.Button</item>
     </style>
     <style name="Widget.EpiAlarm.Button" parent="Widget.Material3.Button">
-        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:background">@drawable/btn_primary_bg</item>
         <item name="background">@drawable/btn_primary_bg</item>
         <item name="android:insetTop">0dp</item>

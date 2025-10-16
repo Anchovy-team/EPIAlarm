@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/background_primary"
     android:paddingTop="60dp"
     tools:context=".TimetableFragment">
 
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="No data"
         android:textSize="18sp"
-        android:textColor="@color/black"
+        android:textColor="@color/text_primary"
         android:layout_gravity="center"
         android:visibility="gone"
         android:layout_marginTop="256dp" />

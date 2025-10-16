@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_primary">
 
     <TextView
         android:id="@+id/connection_status"
@@ -11,7 +12,7 @@
         android:layout_height="wrap_content"
         android:text="Not connected"
         android:textSize="24sp"
-        android:textColor="#000000"
+        android:textColor="@color/text_primary"
         android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -71,7 +72,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="46dp"
-        android:textColor="@color/black"
+        android:textColor="@color/text_primary"
         android:textSize="20sp" />
 
     <Button

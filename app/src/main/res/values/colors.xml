@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Legacy Colors -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -11,8 +12,39 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
+    <!-- Light Mode Colors -->
+    <color name="background_primary">#FFFFFF</color>
+    <color name="background_secondary">#F2F2F7</color>
+    <color name="background_tertiary">#FFFFFF</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#3C3C43</color>
+    <color name="text_tertiary">#8E8E93</color>
+    
+    <!-- Accent Colors -->
+    <color name="accent_primary">#1E63FF</color>
+    <color name="accent_secondary">#5856D6</color>
+    
+    <!-- Surface Colors -->
+    <color name="surface_primary">#F2F2F7</color>
+    <color name="surface_secondary">#FFFFFF</color>
+    
+    <!-- Border Colors -->
+    <color name="border_primary">#E5E5EA</color>
+    <color name="border_secondary">#C7C7CC</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#34C759</color>
+    <color name="warning">#FF9500</color>
+    <color name="error">#FF3B30</color>
+    
     <!-- Bottom Navigation Colors -->
     <color name="nav_background">#F8F8F8</color>
     <color name="nav_selected">#333333</color>
     <color name="nav_unselected">#666666</color>
+    
+    <!-- Card Colors -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_elevation">#000000</color>
 </resources>
