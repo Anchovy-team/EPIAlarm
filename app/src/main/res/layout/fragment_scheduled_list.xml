@@ -21,6 +21,7 @@
         android:id="@+id/scheduledList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:divider="@color/border_primary"
         android:dividerHeight="8dp"
         android:clipToPadding="false" />
 </LinearLayout>

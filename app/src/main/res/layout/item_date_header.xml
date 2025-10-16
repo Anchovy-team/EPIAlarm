@@ -8,5 +8,5 @@
     android:textSize="16sp"
     android:textStyle="bold"
     android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
-    android:background="#EEEEEE"
-    android:textColor="#333333" />
+    android:background="@color/surface_secondary"
+    android:textColor="@color/text_secondary" />
