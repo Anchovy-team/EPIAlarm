@@ -42,9 +42,8 @@ public class SearchTeacherFragment extends DialogFragment {
             allTeachers = teachersViewModel.getCachedTeachers();
             updateTeacherListView(view);
         } else {
-            clientService.authenticate(session.getToken()).thenAccept(authToken -> {
-                fetchAndCacheTeachers(view, teachersViewModel);
-            });
+            clientService.authenticate(session.getToken()).thenAccept(authToken ->
+                    fetchAndCacheTeachers(view, teachersViewModel));
         }
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -128,19 +127,18 @@ public class SearchTeacherFragment extends DialogFragment {
         });
     }
 
-    private void fetchAndCacheTeachers(View view, TeachersViewModel teachersViewModel) {
+    private void fetchAndCacheTeachers(View view, TeachersViewModel vm) {
         TeacherService teacherService = new TeacherService(clientService);
 
-        teacherService.getAllTeachers().thenAccept(teachers -> {
-            allTeachers = teachers;
-            teachersViewModel.setCachedTeachers(teachers);
-
-            requireActivity().runOnUiThread(() -> {
-                updateTeacherListView(view);
-            });
-        }).exceptionally(ex -> {
-            ex.printStackTrace();
-            return null;
-        });
+        teacherService.getAllTeachers()
+                .thenAccept(teachers -> {
+                    allTeachers = teachers;
+                    vm.setCachedTeachers(teachers);
+                    requireActivity().runOnUiThread(() -> updateTeacherListView(view));
+                })
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
     }
 }
