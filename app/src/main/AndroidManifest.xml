@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:allowBackup="true"
@@ -37,7 +38,7 @@
         </activity>
 
         <receiver android:name=".NotificationsBroadcastReceiver" />
-                <receiver android:name=".receiver.BootCompletedReceiver"
+        <receiver android:name=".receiver.BootCompletedReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -56,6 +57,10 @@
                     android:path="${msalPath}" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".AlarmOverlayService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"/>
     </application>
 
 </manifest>

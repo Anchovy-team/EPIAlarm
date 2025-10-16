@@ -1,6 +1,6 @@
 package anchovy.team.epialarm.receiver;
 
-import anchovy.team.epialarm.AlarmService;
+import anchovy.team.epialarm.DeleteAlarmService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Log.d(TAG, "Device rebooted, restoring alarms");
-            AlarmService alarmService = new AlarmService(context);
+            DeleteAlarmService alarmService = new DeleteAlarmService(context);
             alarmService.restoreAllAlarms();
         }
     }

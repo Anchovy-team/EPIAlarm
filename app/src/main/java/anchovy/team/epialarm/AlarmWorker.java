@@ -1,72 +1,37 @@
 package anchovy.team.epialarm;
 
 import android.content.Context;
-import android.media.MediaPlayer;
-import android.os.Build;
-import android.os.PowerManager;
-import android.os.SystemClock;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
-
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import java.util.Objects;
-
 public class AlarmWorker extends Worker {
-    private final Vibrator vibrator;
-    private MediaPlayer mediaPlayer;
 
-    public AlarmWorker(
-            @NonNull Context context,
-            @NonNull WorkerParameters params){
+    public AlarmWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
-        this.vibrator = ContextCompat.getSystemService(context, Vibrator.class);
     }
 
-
-    @Override
     @NonNull
+    @Override
     public Result doWork() {
         String className = getInputData().getString("className");
-        String type = getInputData().getString("type");
-        boolean vibration = getInputData().getBoolean("vibration", false);
+        int advance = getInputData().getInt("advance", 0);
 
-        if(Objects.equals(type, "notification")){
-            System.out.println("notification");
-        }
-        else{
-            CallAlarm(vibration, className);
-            SystemClock.sleep(10000);
-            CancelAlarm();
-        }
+        callAlarm(className, advance);
+
         return Result.success();
     }
 
-    private void CallAlarm(boolean vibration, String className){
+    private void callAlarm(String className, int advance) {
         Context context = getApplicationContext();
 
-        mediaPlayer = MediaPlayer.create(context, R.raw.sound_file_1);
-        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
+        Intent service = new Intent(context, AlarmOverlayService.class);
+        service.putExtra("className", className);
+        service.putExtra("advance", advance);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            long[] pattern = {0, 500, 300, 500};
-            int repeatIndex = 0;
-            VibrationEffect effect = VibrationEffect.createWaveform(pattern, repeatIndex);
-            vibrator.vibrate(effect);
-        }
-
+        ContextCompat.startForegroundService(context, service);
     }
-
-    private void CancelAlarm(){
-        vibrator.cancel();
-        mediaPlayer.stop();
-        mediaPlayer.release();
-    }
-
 
 }
