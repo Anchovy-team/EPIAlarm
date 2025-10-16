@@ -14,7 +14,7 @@
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="@android:color/black"
-        android:paddingTop="40dp"
+        android:paddingTop="50dp"
         android:layout_marginBottom="12dp" />
 
     <ListView
