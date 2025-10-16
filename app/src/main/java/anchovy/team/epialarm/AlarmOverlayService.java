@@ -77,18 +77,21 @@ public class AlarmOverlayService extends Service {
 
         WindowManager.LayoutParams p = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 PixelFormat.TRANSLUCENT);
-        p.gravity = Gravity.TOP;
+        p.gravity = Gravity.CENTER;
 
         overlayView.setAlpha(0f);
-        overlayView.setTranslationY(-200f);
+        overlayView.setScaleX(0.8f);
+        overlayView.setScaleY(0.8f);
         windowManager.addView(overlayView, p);
         overlayView.animate()
-                .alpha(1f).translationY(0f)
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
                 .setDuration(300)
                 .withEndAction(this::startAlarm)
                 .start();
@@ -117,7 +120,9 @@ public class AlarmOverlayService extends Service {
         }
 
         overlayView.animate()
-                .alpha(0f).translationY(-200f)
+                .alpha(0f)
+                .scaleX(0.8f)
+                .scaleY(0.8f)
                 .setDuration(250)
                 .withEndAction(() -> {
                     try {

@@ -1,49 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:background="#EE212121"
-    android:paddingTop="60dp"
-    android:gravity="center_horizontal"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:background="#1C1C1E"
+    android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:padding="32dp">
 
-    <TextView
-        android:id="@+id/textTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Introduction to IAM"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:layout_marginBottom="4dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textCountdown"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="In 60 minutes"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginBottom="12dp" />
-
+    <!-- Main Content Container -->
     <LinearLayout
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <Button
-            android:id="@+id/btnPostpone"
-            android:layout_width="130dp"
+        <!-- Alarm Icon -->
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="POSTPONE"
-            android:layout_marginEnd="12dp" />
+            android:text="🔔"
+            android:textSize="64sp"
+            android:layout_marginBottom="24dp" />
 
-        <Button
-            android:id="@+id/btnClose"
-            android:layout_width="130dp"
+        <!-- Class Title -->
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CLOSE" />
+            android:text="Introduction to IAM"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Countdown Text -->
+        <TextView
+            android:id="@+id/textCountdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="In 60 minutes"
+            android:textColor="#8E8E93"
+            android:textSize="18sp"
+            android:textAlignment="center"
+            android:layout_marginBottom="48dp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnPostpone"
+                android:layout_width="140dp"
+                android:layout_height="56dp"
+                android:text="POSTPONE"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_overlay_secondary"
+                android:layout_marginEnd="16dp" />
+
+            <Button
+                android:id="@+id/btnClose"
+                android:layout_width="140dp"
+                android:layout_height="56dp"
+                android:text="CLOSE"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_overlay_primary" />
+
+        </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>
