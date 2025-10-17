@@ -28,7 +28,7 @@
     
     <!-- Surface Colors -->
     <color name="surface_primary">#F2F2F7</color>
-    <color name="surface_secondary">#FFFFFF</color>
+    <color name="surface_secondary">#E5E5EA</color>
     
     <!-- Border Colors -->
     <color name="border_primary">#E5E5EA</color>
