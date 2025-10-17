@@ -3,16 +3,13 @@ permissions:
   contents: read
   
 on:
-  push:
-    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "dev" ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    environment: dev
     steps:
     - uses: actions/checkout@v4
     - name: set up JDK 17
