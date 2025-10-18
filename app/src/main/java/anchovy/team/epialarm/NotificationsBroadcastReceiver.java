@@ -26,21 +26,24 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
 
         NotificationManager nm = context.getSystemService(NotificationManager.class);
         if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-            nm.createNotificationChannel(new NotificationChannel(
+            NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "Class Notifications",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            ));
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            nm.createNotificationChannel(channel);
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
                 .setContentText(className + " starts in " + advance + " minutes")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
-                . setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         NotificationManagerCompat.from(context).notify(className.hashCode(), builder.build());
     }
