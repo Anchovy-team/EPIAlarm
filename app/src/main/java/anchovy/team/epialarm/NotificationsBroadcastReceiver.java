@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
-
     public static final String CHANNEL_ID = "5555";
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -39,6 +38,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
+                //TODO: Add micro icon for notification
                 .setContentTitle("Upcoming Class")
                 .setContentText(className + " starts in " + advanceMinutes + " minutes")
                 .setPriority(NotificationCompat.PRIORITY_MAX)
