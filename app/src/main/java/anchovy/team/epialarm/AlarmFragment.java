@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -45,11 +46,11 @@ public class AlarmFragment extends Fragment {
     private NumberPicker hourPicker;
     private NumberPicker minutePicker;
     private RadioButton radioAlarm;
+    private Context context;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->{
                 boolean permissionType = radioAlarm.isChecked();
-                Context context = requireContext();
                 if (isGranted) {
                     if(permissionType)
                         Toast.makeText(context, "Overlay permission is granted, now you can Save Settings", Toast.LENGTH_LONG).show();
@@ -67,7 +68,6 @@ public class AlarmFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Context context = requireContext();
         if (requestCode == 1001) {
             if (Settings.canDrawOverlays(context)) {
                 Toast.makeText(context, "Overlay permission granted!", Toast.LENGTH_SHORT).show();
@@ -81,8 +81,10 @@ public class AlarmFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         session = UserSession.getInstance();
+        context = requireContext();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -105,18 +107,15 @@ public class AlarmFragment extends Fragment {
             updatePickersFromAdvance(mins);
         });
 
-        //setAlarm("2025-10-13T22:00:00.0Z", "JS 1");
-        //setNotification("2025-10-13T22:00:00.0Z", "JS 2 PRO");
-
         v.findViewById(R.id.saveSettingsButton).setOnClickListener(btn -> onSaveClicked());
         v.findViewById(R.id.openAlarmsButton).setOnClickListener(view -> openScheduledList());
         return v;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private void onSaveClicked() {
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
         boolean alarmMode = radioAlarm.isChecked();
-        Context context = requireContext();
         if (alarmMode) {
             if(Settings.canDrawOverlays(context)) {
                 session.setAdvanceMinutesAlarm(totalMinutes);
@@ -176,8 +175,8 @@ public class AlarmFragment extends Fragment {
 
         Reservation first = todayList.get(0);
 
-        if(Settings.canDrawOverlays(requireContext())) setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
-        if(ContextCompat.checkSelfPermission(requireContext(),  android.Manifest.permission.POST_NOTIFICATIONS) ==
+        if(Settings.canDrawOverlays(context)) setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
+        if(ContextCompat.checkSelfPermission(context,  android.Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_GRANTED) {
             todayList.stream().skip(1)
                     .forEach(r -> setNotification(
@@ -200,7 +199,6 @@ public class AlarmFragment extends Fragment {
     }
 
     private void setAlarm(String startTimeIso, String className) {
-        Context ctx = requireContext();
         int advance = session.getAdvanceMinutesAlarm();
 
         Duration delay = Duration.between(Instant.now(), Instant.parse(startTimeIso).minus(advance,
@@ -214,24 +212,23 @@ public class AlarmFragment extends Fragment {
                         .build())
                 .build();
 
-        WorkManager.getInstance(ctx).enqueueUniqueWork("setAlarm", ExistingWorkPolicy.REPLACE, req);
+        WorkManager.getInstance(context).enqueueUniqueWork("setAlarm", ExistingWorkPolicy.REPLACE, req);
     }
 
     private void setNotification(String startTimeIso, String className) {
-        Context ctx = requireContext();
         int advance = session.getAdvanceMinutesReminder();
 
         long triggerAt = Instant.parse(startTimeIso).atZone(ZoneId.of("Europe/Paris"))
                 .minusMinutes(advance).toInstant().toEpochMilli();
 
-        Intent i = new Intent(ctx, NotificationsBroadcastReceiver.class)
+        Intent i = new Intent(context, NotificationsBroadcastReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance);
 
-        PendingIntent pi = PendingIntent.getBroadcast(ctx, 123, i,
+        PendingIntent pi = PendingIntent.getBroadcast(context, 123, i,
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-        ((AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE))
+        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
                 .setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 }
