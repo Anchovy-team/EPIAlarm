@@ -1,7 +1,5 @@
 package anchovy.team.epialarm;
 
-import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
-
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,9 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -42,7 +37,8 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)//TODO: Add micro icon for notification
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                //TODO: Add micro icon for notification
                 .setContentTitle("Upcoming Class")
                 .setContentText(className + " starts in " + advanceMinutes + " minutes")
                 .setPriority(NotificationCompat.PRIORITY_MAX)
