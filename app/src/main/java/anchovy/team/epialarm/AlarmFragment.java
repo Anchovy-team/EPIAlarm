@@ -81,7 +81,9 @@ public class AlarmFragment extends Fragment {
             session.setAdvanceMinutesReminder(totalMinutes);
         }
 
-        scheduleTodayEvents();
+        //scheduleTodayEvents();
+        setAlarm("2025-10-18T19:00:00.0Z", "Intro to Javascript");
+        setNotification("2025-10-18T19:00:00.0Z", "IAM Fundamentals");
     }
 
     private void scheduleTodayEvents() {
@@ -131,23 +133,33 @@ public class AlarmFragment extends Fragment {
         Context ctx = requireContext();
         int advance = session.getAdvanceMinutesAlarm();
 
-        Duration delay = Duration.between(Instant.now(), Instant.parse(startTimeIso).minus(advance,
-                ChronoUnit.MINUTES));
+        if (advance <= 0) {
+            return;
+        }
 
-        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(AlarmWorker.class)
-                .setInitialDelay(delay.isNegative() ? Duration.ZERO : delay)
-                .setInputData(new Data.Builder()
-                        .putString("className", className)
-                        .putInt("advance", advance)
-                        .build())
-                .build();
+        long triggerAt = Instant.parse(startTimeIso)
+                .minus(advance, ChronoUnit.MINUTES)
+                .toEpochMilli();
 
-        WorkManager.getInstance(ctx).enqueueUniqueWork("setAlarm", ExistingWorkPolicy.REPLACE, req);
+        Intent i = new Intent(ctx, AlarmReceiver.class)
+                .putExtra("className", className)
+                .putExtra("advance", advance);
+
+        PendingIntent pi = PendingIntent.getBroadcast(
+                ctx, (className + "_alarm").hashCode(),
+                i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
     private void setNotification(String startTimeIso, String className) {
         Context ctx = requireContext();
         int advance = session.getAdvanceMinutesReminder();
+
+        if (advance <= 0) {
+            return;
+        }
 
         long triggerAt = Instant.parse(startTimeIso).atZone(ZoneId.of("Europe/Paris"))
                 .minusMinutes(advance).toInstant().toEpochMilli();
