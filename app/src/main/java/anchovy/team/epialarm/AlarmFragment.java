@@ -16,11 +16,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.work.Data;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -38,7 +33,7 @@ public class AlarmFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        session = UserSession.getInstance();
+        session = UserSession.getInstance(requireContext());
     }
 
     @Override
@@ -63,9 +58,6 @@ public class AlarmFragment extends Fragment {
             updatePickersFromAdvance(mins);
         });
 
-        //setAlarm("2025-10-13T22:00:00.0Z", "JS 1");
-        //setNotification("2025-10-13T22:00:00.0Z", "JS 2 PRO");
-
         v.findViewById(R.id.saveSettingsButton).setOnClickListener(btn -> onSaveClicked());
         v.findViewById(R.id.openAlarmsButton).setOnClickListener(view -> openScheduledList());
         return v;
@@ -81,9 +73,9 @@ public class AlarmFragment extends Fragment {
             session.setAdvanceMinutesReminder(totalMinutes);
         }
 
-        //scheduleTodayEvents();
-        setAlarm("2025-10-18T19:00:00.0Z", "Intro to Javascript");
-        setNotification("2025-10-18T19:00:00.0Z", "IAM Fundamentals");
+        //setAlarm("2025-10-19T01:00:00.0Z", "Intro to Javascript");
+        //setNotification("2025-10-19T01:00:00.0Z", "IAM Fundamentals");
+        scheduleTodayEvents();
     }
 
     private void scheduleTodayEvents() {
@@ -140,6 +132,9 @@ public class AlarmFragment extends Fragment {
         long triggerAt = Instant.parse(startTimeIso)
                 .minus(advance, ChronoUnit.MINUTES)
                 .toEpochMilli();
+        if (triggerAt < System.currentTimeMillis()) {
+            return;
+        }
 
         Intent i = new Intent(ctx, AlarmReceiver.class)
                 .putExtra("className", className)
@@ -161,17 +156,22 @@ public class AlarmFragment extends Fragment {
             return;
         }
 
-        long triggerAt = Instant.parse(startTimeIso).atZone(ZoneId.of("Europe/Paris"))
-                .minusMinutes(advance).toInstant().toEpochMilli();
+        long triggerAt = Instant.parse(startTimeIso)
+                .minus(advance, ChronoUnit.MINUTES)
+                .toEpochMilli();
+        if (triggerAt < System.currentTimeMillis()) {
+            return;
+        }
 
         Intent i = new Intent(ctx, NotificationsBroadcastReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance);
 
-        PendingIntent pi = PendingIntent.getBroadcast(ctx, 123, i,
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(
+                ctx, (className + "_notification").hashCode(),
+                i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        ((AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE))
-                .setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 }

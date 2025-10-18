@@ -21,11 +21,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.work.Data;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import java.util.concurrent.TimeUnit;
 
 public class AlarmOverlayService extends Service {
 
@@ -131,8 +126,12 @@ public class AlarmOverlayService extends Service {
     private void wakeScreen() {
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         if (pm != null) {
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "epialarm:wake");
-            wakeLock.acquire(5 * 60 * 1000L);
+            if (wakeLock == null || !wakeLock.isHeld()) {
+                wakeLock = pm.newWakeLock(
+                        PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                        "epialarm:wake");
+                wakeLock.acquire(5 * 60 * 1000L);
+            }
         }
     }
 
@@ -144,8 +143,8 @@ public class AlarmOverlayService extends Service {
                     .withEndAction(() -> {
                         try {
                             wm.removeViewImmediate(overlay);
-                        } catch (Exception ignored) {
-                            throw new RuntimeException();
+                        } catch (Exception e) {
+                            android.util.Log.w("AlarmOverlayService", "Overlay already removed", e);
                         }
                         overlay = null;
                         if (postpone && className != null) {
@@ -167,8 +166,8 @@ public class AlarmOverlayService extends Service {
                 if (player.isPlaying()) {
                     player.stop();
                 }
-            } catch (Exception ignored) {
-                throw new RuntimeException();
+            } catch (Exception e) {
+                android.util.Log.w("AlarmOverlayService", "Overlay already removed", e);
             }
             player.release();
             player = null;
@@ -189,6 +188,9 @@ public class AlarmOverlayService extends Service {
         }
 
         long triggerAt = System.currentTimeMillis() + minutes * 60_000L;
+        if (triggerAt <= System.currentTimeMillis()) {
+            return;
+        }
 
         Intent i = new Intent(this, AlarmReceiver.class)
                 .putExtra("className", className)

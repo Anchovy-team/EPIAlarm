@@ -23,7 +23,6 @@ public class SearchGroupFragment extends DialogFragment {
     private ArrayAdapter<String> adapter;
     private final List<String> filteredGroups = new ArrayList<>();
     private final ZeusApiClient clientService = new ZeusApiClient();
-    //private GroupsService groupsService;
     private UserSession session;
 
     @Override
@@ -36,7 +35,7 @@ public class SearchGroupFragment extends DialogFragment {
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search group...");
 
-        session = UserSession.getInstance();
+        session = UserSession.getInstance(requireContext());
         GroupsViewModel groupsViewModel = new ViewModelProvider(requireActivity()).get(
                 GroupsViewModel.class);
 

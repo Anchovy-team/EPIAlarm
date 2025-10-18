@@ -13,39 +13,34 @@ import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
 
-    public static final String CHANNEL_ID = "5555";
+    private static final String CHANNEL_ID = "class_notifications";
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Override
     public void onReceive(Context context, Intent intent) {
         String className = intent.getStringExtra("className");
-        int advanceMinutes = intent.getIntExtra("advance", 0);
-        sendNotification(context, className, advanceMinutes);
-    }
+        int advance = intent.getIntExtra("advance", 0);
+        if (advance <= 0) {
+            return;
+        }
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private void sendNotification(Context context, String className, int advanceMinutes) {
-        NotificationManager notificationManager = context.getSystemService(
-                NotificationManager.class);
-
-        if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
-            NotificationChannel channel = new NotificationChannel(
+        NotificationManager nm = context.getSystemService(NotificationManager.class);
+        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
+            nm.createNotificationChannel(new NotificationChannel(
                     CHANNEL_ID,
                     "Class Notifications",
-                    NotificationManager.IMPORTANCE_HIGH
-            );
-            notificationManager.createNotificationChannel(channel);
+                    NotificationManager.IMPORTANCE_DEFAULT
+            ));
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
-                .setContentText(className + " starts in " + advanceMinutes + " minutes")
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_REMINDER)
-                .setAutoCancel(true)
+                .setContentText(className + " starts in " + advance + " minutes")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                .setAutoCancel(true)
+                . setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         NotificationManagerCompat.from(context).notify(className.hashCode(), builder.build());
     }
