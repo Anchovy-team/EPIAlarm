@@ -6,6 +6,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,13 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresPermission;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.work.Data;
@@ -34,6 +42,24 @@ public class AlarmFragment extends Fragment {
     private NumberPicker hourPicker;
     private NumberPicker minutePicker;
     private RadioButton radioAlarm;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->{
+                boolean permissionType = radioAlarm.isChecked();
+                Context context = requireContext();
+                if (isGranted) {
+                    if(permissionType)
+                        Toast.makeText(context, "Overlay permission is granted, now you can Save Settings", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(context, "Notification permission is granted,  now you can Save Settings", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    if (permissionType)
+                        Toast.makeText(context, "Overlay permission is denied, you will not have alarms", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(context, "Notification permission is denied, you will not recieve notifications", Toast.LENGTH_LONG).show();
+                }
+            });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,8 +103,29 @@ public class AlarmFragment extends Fragment {
 
         if (alarmMode) {
             session.setAdvanceMinutesAlarm(totalMinutes);
+            /*if(ContextCompat.checkSelfPermission(requireContext(),  android.Manifest.permission.SYSTEM_ALERT_WINDOW) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                session.setAdvanceMinutesAlarm(totalMinutes);
+            }else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    requireActivity(), android.Manifest.permission.SYSTEM_ALERT_WINDOW)) {
+                Toast.makeText(requireContext(), "Alarm can not be set up, because you denied overlay request", Toast.LENGTH_LONG).show();
+            }
+            else{
+                requestPermissionLauncher.launch(android.Manifest.permission.SYSTEM_ALERT_WINDOW);
+            }*/
+
         } else {
-            session.setAdvanceMinutesReminder(totalMinutes);
+            if(ContextCompat.checkSelfPermission(requireContext(),  android.Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                session.setAdvanceMinutesReminder(totalMinutes);
+            }else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    requireActivity(), android.Manifest.permission.POST_NOTIFICATIONS)) {
+                Toast.makeText(requireContext(), "Notifications can not be sent, because you denied notification request", Toast.LENGTH_LONG).show();
+            }
+            else{
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+            }
+
         }
 
         scheduleTodayEvents();
