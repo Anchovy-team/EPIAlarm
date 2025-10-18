@@ -28,6 +28,7 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textAppearance">@style/TextAppearance.EpiAlarm.Button</item>
     </style>
+    
     <style name="Widget.EpiAlarm.Button" parent="Widget.Material3.Button">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/btn_primary_bg</item>

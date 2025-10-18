@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Colors -->
+    <color name="background_primary">#1C1C1E</color>
+    <color name="background_secondary">#2C2C2E</color>
+    <color name="background_tertiary">#3A3A3C</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#EBEBF5</color>
+    <color name="text_tertiary">#8E8E93</color>
+    
+    <!-- Accent Colors -->
+    <color name="accent_primary">#0A84FF</color>
+    <color name="accent_secondary">#5856D6</color>
+    
+    <!-- Surface Colors -->
+    <color name="surface_primary">#2C2C2E</color>
+    <color name="surface_secondary">#3A3A3C</color>
+    
+    <!-- Border Colors -->
+    <color name="border_primary">#48484A</color>
+    <color name="border_secondary">#636366</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#34C759</color>
+    <color name="warning">#FF9500</color>
+    <color name="error">#FF3B30</color>
+    
+    <!-- Bottom Navigation Colors -->
+    <color name="nav_background">#1C1C1E</color>
+    <color name="nav_selected">#FFFFFF</color>
+    <color name="nav_unselected">#8E8E93</color>
+    
+    <!-- Card Colors -->
+    <color name="card_background">#2C2C2E</color>
+    <color name="card_elevation">#000000</color>
+</resources>

@@ -101,7 +101,7 @@ public class AlarmFragment extends Fragment {
                     .toList();
         }
 
-        if (todayList == null) {
+        if (todayList == null || todayList.isEmpty()) {
             return;
         }
 
