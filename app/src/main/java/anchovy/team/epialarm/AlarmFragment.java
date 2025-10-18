@@ -3,17 +3,27 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.utils.NumberPickerHelper;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import java.time.Instant;
@@ -29,13 +39,55 @@ public class AlarmFragment extends Fragment {
     private NumberPicker hourPicker;
     private NumberPicker minutePicker;
     private RadioButton radioAlarm;
+    private Context context;
+
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                    isGranted -> {
+                    boolean permissionType = radioAlarm.isChecked();
+                    if (isGranted) {
+                        if (permissionType) {
+                            Toast.makeText(context, "Overlay permission is granted, "
+                                + "now you can Save Settings", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(context, "Notification permission is granted,"
+                                        + " now you can Save Settings",
+                                Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        if (permissionType) {
+                            Toast.makeText(context,
+                                "Overlay permission is denied, you will not have alarms",
+                                Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(context,
+                                "Notification permission is denied,"
+                                        + " you will not recieve notifications",
+                                Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001) {
+            if (Settings.canDrawOverlays(context)) {
+                Toast.makeText(context, "Overlay permission granted!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Overlay permission denied.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        session = UserSession.getInstance(requireContext());
+        super.onCreate(savedInstanceState);        
+        context = requireContext();
+        session = UserSession.getInstance(context);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -63,14 +115,42 @@ public class AlarmFragment extends Fragment {
         return v;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private void onSaveClicked() {
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
         boolean alarmMode = radioAlarm.isChecked();
-
         if (alarmMode) {
-            session.setAdvanceMinutesAlarm(totalMinutes);
+            if (Settings.canDrawOverlays(context)) {
+                session.setAdvanceMinutesAlarm(totalMinutes);
+            } else {
+                new AlertDialog.Builder(context)
+                    .setTitle("Permission Required")
+                    .setMessage("To show alarm window, please allow overlay")
+                    .setPositiveButton("Allow", (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:anchovy.team.epialarm"));
+                        startActivityForResult(intent, 1001);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .setCancelable(false)
+                    .show();
+            }
         } else {
-            session.setAdvanceMinutesReminder(totalMinutes);
+            if (ContextCompat.checkSelfPermission(context,
+                    android.Manifest.permission.POST_NOTIFICATIONS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                session.setAdvanceMinutesReminder(totalMinutes);
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    requireActivity(), android.Manifest.permission.POST_NOTIFICATIONS)) {
+                Toast.makeText(context,
+                        "Notifications can not be sent, because you denied notification request",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+            }
+
         }
 
         //setAlarm("2025-10-19T01:00:00.0Z", "Intro to Javascript");
@@ -100,12 +180,18 @@ public class AlarmFragment extends Fragment {
         }
 
         Reservation first = todayList.get(0);
-        setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
 
-        todayList.stream().skip(1)
-                .forEach(r -> setNotification(
-                        r.getStartDate().atZone(zone).toInstant().toString(),
-                        r.getName()));
+        if (Settings.canDrawOverlays(context)) {
+            setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
+        }
+        if (ContextCompat.checkSelfPermission(context,
+                android.Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) {
+            todayList.stream().skip(1)
+                    .forEach(r -> setNotification(
+                            r.getStartDate().atZone(zone).toInstant().toString(),
+                            r.getName()));
+        }
     }
 
     private void openScheduledList() {
@@ -122,7 +208,6 @@ public class AlarmFragment extends Fragment {
     }
 
     private void setAlarm(String startTimeIso, String className) {
-        Context ctx = requireContext();
         int advance = session.getAdvanceMinutesAlarm();
 
         if (advance <= 0) {
@@ -136,20 +221,19 @@ public class AlarmFragment extends Fragment {
             return;
         }
 
-        Intent i = new Intent(ctx, AlarmReceiver.class)
+        Intent i = new Intent(context, AlarmReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance);
 
         PendingIntent pi = PendingIntent.getBroadcast(
-                ctx, (className + "_alarm").hashCode(),
+                context, (className + "_alarm").hashCode(),
                 i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
     private void setNotification(String startTimeIso, String className) {
-        Context ctx = requireContext();
         int advance = session.getAdvanceMinutesReminder();
 
         if (advance <= 0) {
@@ -163,15 +247,15 @@ public class AlarmFragment extends Fragment {
             return;
         }
 
-        Intent i = new Intent(ctx, NotificationsBroadcastReceiver.class)
+        Intent i = new Intent(context, NotificationsBroadcastReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance);
 
         PendingIntent pi = PendingIntent.getBroadcast(
-                ctx, (className + "_notification").hashCode(),
+                context, (className + "_notification").hashCode(),
                 i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 }
