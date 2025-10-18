@@ -124,7 +124,7 @@ public class AlarmFragment extends Fragment {
             else {
                 new AlertDialog.Builder(context)
                         .setTitle("Permission Required")
-                        .setMessage("To show floating windows, please allow overlay permission in settings.")
+                        .setMessage("To show alarm window, please allow overlay permission in settings.")
                         .setPositiveButton("Allow", (dialog, which) -> {
                             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                     Uri.parse("package:anchovy.team.epialarm"));
