@@ -3,12 +3,15 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.utils.NumberPickerHelper;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +65,19 @@ public class AlarmFragment extends Fragment {
             });
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Context context = requireContext();
+        if (requestCode == 1001) {
+            if (Settings.canDrawOverlays(context)) {
+                Toast.makeText(context, "Overlay permission granted!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Overlay permission denied.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         session = UserSession.getInstance();
@@ -100,27 +116,33 @@ public class AlarmFragment extends Fragment {
     private void onSaveClicked() {
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
         boolean alarmMode = radioAlarm.isChecked();
-
+        Context context = requireContext();
         if (alarmMode) {
-            session.setAdvanceMinutesAlarm(totalMinutes);
-            /*if(ContextCompat.checkSelfPermission(requireContext(),  android.Manifest.permission.SYSTEM_ALERT_WINDOW) ==
-                    PackageManager.PERMISSION_GRANTED) {
+            if(Settings.canDrawOverlays(context)) {
                 session.setAdvanceMinutesAlarm(totalMinutes);
-            }else if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    requireActivity(), android.Manifest.permission.SYSTEM_ALERT_WINDOW)) {
-                Toast.makeText(requireContext(), "Alarm can not be set up, because you denied overlay request", Toast.LENGTH_LONG).show();
             }
-            else{
-                requestPermissionLauncher.launch(android.Manifest.permission.SYSTEM_ALERT_WINDOW);
-            }*/
-
+            else {
+                new AlertDialog.Builder(context)
+                        .setTitle("Permission Required")
+                        .setMessage("To show floating windows, please allow overlay permission in settings.")
+                        .setPositiveButton("Allow", (dialog, which) -> {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                    Uri.parse("package:anchovy.team.epialarm"));
+                            startActivityForResult(intent, 1001);
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .setCancelable(false)
+                        .show();
+            }
         } else {
-            if(ContextCompat.checkSelfPermission(requireContext(),  android.Manifest.permission.POST_NOTIFICATIONS) ==
+            if(ContextCompat.checkSelfPermission(context,  android.Manifest.permission.POST_NOTIFICATIONS) ==
                     PackageManager.PERMISSION_GRANTED) {
                 session.setAdvanceMinutesReminder(totalMinutes);
             }else if (ActivityCompat.shouldShowRequestPermissionRationale(
                     requireActivity(), android.Manifest.permission.POST_NOTIFICATIONS)) {
-                Toast.makeText(requireContext(), "Notifications can not be sent, because you denied notification request", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Notifications can not be sent, because you denied notification request", Toast.LENGTH_LONG).show();
             }
             else{
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
@@ -153,12 +175,15 @@ public class AlarmFragment extends Fragment {
         }
 
         Reservation first = todayList.get(0);
-        setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
 
-        todayList.stream().skip(1)
-                .forEach(r -> setNotification(
-                        r.getStartDate().atZone(zone).toInstant().toString(),
-                        r.getName()));
+        if(Settings.canDrawOverlays(requireContext())) setAlarm(first.getStartDate().atZone(zone).toInstant().toString(), first.getName());
+        if(ContextCompat.checkSelfPermission(requireContext(),  android.Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED) {
+            todayList.stream().skip(1)
+                    .forEach(r -> setNotification(
+                            r.getStartDate().atZone(zone).toInstant().toString(),
+                            r.getName()));
+        }
     }
 
     private void openScheduledList() {
