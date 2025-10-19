@@ -62,7 +62,7 @@ public class AlarmFragment extends Fragment {
                         } else {
                             Toast.makeText(context,
                                 "Notification permission is denied,"
-                                        + " you will not recieve notifications",
+                                        + " you will not receive notifications",
                                 Toast.LENGTH_LONG).show();
                         }
                     }
@@ -131,9 +131,7 @@ public class AlarmFragment extends Fragment {
                                 Uri.parse("package:anchovy.team.epialarm"));
                         startActivityForResult(intent, 1001);
                     })
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                        dialog.dismiss();
-                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .setCancelable(false)
                     .show();
             }
