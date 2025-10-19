@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class DeleteAlarmService {
-    private static final String TAG = "AlarmService";
+    // private static final String TAG = "AlarmService";
     private static final String PREF_NAME = "alarms_pref";
     private static final String ALARMS_KEY = "alarms_list";
 
@@ -148,9 +147,9 @@ public class DeleteAlarmService {
                 // Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in "
                 //        + alarm.getAdvanceMinutes() + " minutes");
             }
-        } else {
-            // Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
-        }
+        } // else {
+        // Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
+        // }
     }
 
     public void cancelAlarm(String id) {
