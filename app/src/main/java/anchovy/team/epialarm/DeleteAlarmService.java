@@ -145,11 +145,11 @@ public class DeleteAlarmService {
             if (alarmManager != null) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + delayMillis, pendingIntent);
-                Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in "
-                        + alarm.getAdvanceMinutes() + " minutes");
+                // Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in "
+                //        + alarm.getAdvanceMinutes() + " minutes");
             }
         } else {
-            Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
+            // Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
         }
     }
 
@@ -167,7 +167,7 @@ public class DeleteAlarmService {
             if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);
                 pendingIntent.cancel();
-                Log.d(TAG, "Alarm canceled: " + id);
+                // Log.d(TAG, "Alarm canceled: " + id);
             }
         }
     }
@@ -179,6 +179,6 @@ public class DeleteAlarmService {
                 scheduleAlarm(alarm);
             }
         }
-        Log.d(TAG, "Restored " + alarms.size() + " alarms after reboot");
+        // Log.d(TAG, "Restored " + alarms.size() + " alarms after reboot");
     }
 }
