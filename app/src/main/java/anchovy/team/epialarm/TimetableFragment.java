@@ -43,7 +43,7 @@ public class TimetableFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-        session = UserSession.getInstance();
+        session = UserSession.getInstance(requireContext());
     }
 
     @Override

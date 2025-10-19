@@ -27,7 +27,7 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        session = UserSession.getInstance();
+        session = UserSession.getInstance(requireContext());
     }
 
     @Override

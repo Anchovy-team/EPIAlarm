@@ -34,6 +34,12 @@ public class ScheduledListFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadScheduled();
+    }
+
     private void loadScheduled() {
         TimetableViewModel viewModel = new ViewModelProvider(requireActivity())
                 .get(TimetableViewModel.class);
@@ -56,20 +62,26 @@ public class ScheduledListFragment extends Fragment {
             todayList.sort(Comparator.comparing(Reservation::getStartDate));
 
             if (!todayList.isEmpty()) {
-                UserSession session = UserSession.getInstance();
+                UserSession session = UserSession.getInstance(requireContext());
 
                 for (int i = 0; i < todayList.size(); i++) {
                     Reservation r = todayList.get(i);
                     boolean isAlarm = i == 0;
+
                     int advance = isAlarm
                             ? session.getAdvanceMinutesAlarm()
                             : session.getAdvanceMinutesReminder();
+                    if (advance <= 0) {
+                        continue;
+                    }
 
-                    String triggerTime = r.getStartDate()
-                            .minusMinutes(advance)
-                            .atZone(zone)
-                            .toLocalTime()
-                            .format(fmt);
+                    var startZoned = r.getStartDate().atZone(zone);
+                    var triggerZoned = startZoned.minusMinutes(advance);
+                    if (triggerZoned.toInstant().toEpochMilli() < System.currentTimeMillis()) {
+                        continue;
+                    }
+
+                    String triggerTime = triggerZoned.toLocalTime().format(fmt);
 
                     Map<String, String> row = new HashMap<>();
                     row.put("title", r.getName());

@@ -26,11 +26,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.work.Data;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -87,9 +82,9 @@ public class AlarmFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        session = UserSession.getInstance();
+        super.onCreate(savedInstanceState);        
         context = requireContext();
+        session = UserSession.getInstance(context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -158,6 +153,8 @@ public class AlarmFragment extends Fragment {
 
         }
 
+        //setAlarm("2025-10-19T01:00:00.0Z", "Intro to Javascript");
+        //setNotification("2025-10-19T01:00:00.0Z", "IAM Fundamentals");
         scheduleTodayEvents();
     }
 
@@ -213,35 +210,52 @@ public class AlarmFragment extends Fragment {
     private void setAlarm(String startTimeIso, String className) {
         int advance = session.getAdvanceMinutesAlarm();
 
-        Duration delay = Duration.between(Instant.now(), Instant.parse(startTimeIso).minus(advance,
-                ChronoUnit.MINUTES));
+        if (advance <= 0) {
+            return;
+        }
 
-        OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(AlarmWorker.class)
-                .setInitialDelay(delay.isNegative() ? Duration.ZERO : delay)
-                .setInputData(new Data.Builder()
-                        .putString("className", className)
-                        .putInt("advance", advance)
-                        .build())
-                .build();
+        long triggerAt = Instant.parse(startTimeIso)
+                .minus(advance, ChronoUnit.MINUTES)
+                .toEpochMilli();
+        if (triggerAt < System.currentTimeMillis()) {
+            return;
+        }
 
-        WorkManager.getInstance(context).enqueueUniqueWork(
-                "setAlarm", ExistingWorkPolicy.REPLACE, req);
+        Intent i = new Intent(context, AlarmReceiver.class)
+                .putExtra("className", className)
+                .putExtra("advance", advance);
+
+        PendingIntent pi = PendingIntent.getBroadcast(
+                context, (className + "_alarm").hashCode(),
+                i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
     private void setNotification(String startTimeIso, String className) {
         int advance = session.getAdvanceMinutesReminder();
 
-        long triggerAt = Instant.parse(startTimeIso).atZone(ZoneId.of("Europe/Paris"))
-                .minusMinutes(advance).toInstant().toEpochMilli();
+        if (advance <= 0) {
+            return;
+        }
+
+        long triggerAt = Instant.parse(startTimeIso)
+                .minus(advance, ChronoUnit.MINUTES)
+                .toEpochMilli();
+        if (triggerAt < System.currentTimeMillis()) {
+            return;
+        }
 
         Intent i = new Intent(context, NotificationsBroadcastReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance);
 
-        PendingIntent pi = PendingIntent.getBroadcast(context, 123, i,
-                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(
+                context, (className + "_notification").hashCode(),
+                i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
-                .setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 }
