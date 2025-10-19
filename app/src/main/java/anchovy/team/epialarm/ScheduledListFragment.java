@@ -24,19 +24,16 @@ public class ScheduledListFragment extends Fragment {
 
     private ListView scheduledList;
 
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_scheduled_list, container, false);
-        scheduledList = v.findViewById(R.id.scheduledList);
-        loadScheduled();
-        return v;
+        return inflater.inflate(R.layout.fragment_scheduled_list, container, false);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        scheduledList = view.findViewById(R.id.scheduledList);
         loadScheduled();
     }
 
@@ -85,7 +82,7 @@ public class ScheduledListFragment extends Fragment {
 
                     Map<String, String> row = new HashMap<>();
                     row.put("title", r.getName());
-                    row.put("time", triggerTime + " • " + (isAlarm ? "Alarm" : "Reminder"));
+                    row.put("time", triggerTime);
                     row.put("type", isAlarm ? "Alarm" : "Reminder");
                     data.add(row);
                 }
