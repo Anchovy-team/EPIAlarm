@@ -2,6 +2,7 @@
 .idea
 .gradle
 local.properties
+keystore.properties.release
 keystore.properties
 build
 app/src/main/assets/env
