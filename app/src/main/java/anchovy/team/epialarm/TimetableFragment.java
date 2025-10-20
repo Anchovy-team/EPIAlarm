@@ -1,11 +1,9 @@
 package anchovy.team.epialarm;
 
-import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Group;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import anchovy.team.epialarm.zeus.models.Room;
 import anchovy.team.epialarm.zeus.models.Teacher;
-import anchovy.team.epialarm.zeus.services.ReservationService;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,20 +28,19 @@ import java.util.stream.Collectors;
 
 public class TimetableFragment extends Fragment {
 
-    Map<LocalDate, List<Reservation>> reservationsGrouped;
-    ZeusApiClient clientService = new ZeusApiClient();
-    ReservationService reservationService;
-    List<Reservation> reservations;
+    private Map<LocalDate, List<Reservation>> reservationsGrouped;
     private TimetableViewModel viewModel;
     private TextView emptyMessage;
     private ListView listView;
     private UserSession session;
+    private ScheduleRepository scheduleRepository;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
         session = UserSession.getInstance(requireContext());
+        scheduleRepository = ScheduleRepository.getInstance();
     }
 
     @Override
@@ -56,84 +53,44 @@ public class TimetableFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        listView = view.findViewById(R.id.LessonsListView);
-        listView.setClickable(true);
         emptyMessage = view.findViewById(R.id.empty_message);
+        listView = view.findViewById(R.id.LessonsListView);
+
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            Object itemRead = parent.getItemAtPosition(position);
+            if (itemRead instanceof DateHeaderItem) {
+                return;
+            }
+            ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(position);
+            openClassInfo(reservationItem.getReservation());
+        });
 
         if (viewModel.reservations != null && !viewModel.reservations.isEmpty()) {
             reservationsGrouped = viewModel.groupedReservations;
-            reservations = viewModel.reservations;
             loadData();
-        }
-
-        if (session.getToken() == null) {
-            emptyMessage.setText("Nothing to see here, you are not authorized");
-            emptyMessage.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+        } else if (session.getToken() == null) {
+            showMessage("Nothing to see here, you are not authorized");
         } else if (session.getChosenType() == null) {
-            emptyMessage.setText("You have to choose a group or a teacher!");
-            emptyMessage.setVisibility(View.VISIBLE);
-            listView.setVisibility(View.GONE);
+            showMessage("You have to choose a group or a teacher!");
         } else {
             emptyMessage.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
-
-            try {
-                clientService.authenticate(session.getToken()).thenAccept(token1 -> {
-                }).join();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            reservationService = new ReservationService(clientService);
             reservationsGrouped = new TreeMap<>();
-            LocalDateTime today = LocalDate.now().atStartOfDay();
-            LocalDateTime oneWeekForward = LocalDateTime.now().plusWeeks(1);
 
-            if ("group".equals(session.getChosenType())) {
-
-                List<Long> groups = new ArrayList<>();
-                groups.add(session.getGroupId());
-
-                reservationService.getReservationsByFilter(groups, new ArrayList<>(),
-                                new ArrayList<>(), today, oneWeekForward)
-                        .thenAccept(res -> requireActivity().runOnUiThread(() ->
-                                setReservations(reservations = res)))
-                        .exceptionally(ex -> {
-                            ex.printStackTrace();
-                            return null; });
-
-            } else if ("teacher".equals(session.getChosenType())) {
-
-                List<Long> teachers = new ArrayList<>();
-                teachers.add(session.getTeacherId());
-
-                reservationService.getReservationsByFilter(new ArrayList<>(), new ArrayList<>(),
-                                teachers, today, oneWeekForward)
-                        .thenAccept(res -> requireActivity().runOnUiThread(() ->
-                                setReservations(reservations = res)))
-                        .exceptionally(ex -> {
-                            ex.printStackTrace();
-                            return null;
-                        });
-
-            }
-
-            listView.setOnItemClickListener((parent, view1, position, id) -> {
-                Object itemRead = parent.getItemAtPosition(position);
-                if (itemRead instanceof DateHeaderItem) {
-                    return;
-                }
-                ReservationItem reservationItem = (ReservationItem) parent.getItemAtPosition(
-                        position);
-                openClassInfo(reservationItem.getReservation());
-            });
+            scheduleRepository.fetchReservations(requireContext())
+                    .thenAccept(res -> requireActivity().runOnUiThread(() -> setReservations(res)))
+                    .exceptionally(ex -> {
+                        ex.printStackTrace();
+                        requireActivity().runOnUiThread(() -> showMessage("Timetable fail"));
+                        return null;
+                    });
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void showMessage(String message) {
+        emptyMessage.setText(message);
+        emptyMessage.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.GONE);
     }
 
     public void loadData() {
@@ -144,15 +101,14 @@ public class TimetableFragment extends Fragment {
                 listView.setAdapter(customBaseAdapter);
             }
             if (customBaseAdapter.isEmpty()) {
-                emptyMessage.setText("No classes found :(");
-                emptyMessage.setVisibility(View.VISIBLE);
-                listView.setVisibility(View.GONE);
+                showMessage("No classes found :(");
             }
         }
     }
 
     public void setReservations(List<Reservation> reservations) {
         if (reservations == null) {
+            showMessage("No classes found :(");
             return;
         }
 
@@ -163,7 +119,8 @@ public class TimetableFragment extends Fragment {
                     .withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();
             r.setStartDate(parisDateTime.toLocalDateTime());
-            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC")).withZoneSameInstant(parisZone)
+            r.setEndDate(r.getEndDate().atZone(ZoneId.of("UTC"))
+                    .withZoneSameInstant(parisZone)
                     .toLocalDateTime());
             reservationsGrouped.computeIfAbsent(date, k -> new ArrayList<>()).add(r);
         }
@@ -178,6 +135,7 @@ public class TimetableFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString("className", item.getName());
         args.putString("activityType", item.getTypeName());
+
         LocalDateTime start = item.getStartDate();
         LocalDateTime end = item.getEndDate();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

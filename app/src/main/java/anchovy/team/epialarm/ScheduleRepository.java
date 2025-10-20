@@ -4,6 +4,7 @@ import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import anchovy.team.epialarm.zeus.services.ReservationService;
 import android.content.Context;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ScheduleRepository {
             return CompletableFuture.completedFuture(new ArrayList<>());
         }
 
-        LocalDateTime from = LocalDateTime.now();
+        LocalDateTime from = LocalDate.now().atStartOfDay();
         LocalDateTime to = LocalDateTime.now().plusWeeks(1);
 
         if ("group".equals(session.getChosenType())) {
