@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class EnvLoader {
+public class DeleteEnvLoader {
     private static JSONObject env;
 
     public static void init(Context context) {

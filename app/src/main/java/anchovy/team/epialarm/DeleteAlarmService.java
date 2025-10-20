@@ -1,12 +1,11 @@
 package anchovy.team.epialarm;
 
-import anchovy.team.epialarm.entity.AlarmData;
+import anchovy.team.epialarm.entity.DeleteAlarmData;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class DeleteAlarmService {
-    private static final String TAG = "AlarmService";
+    // private static final String TAG = "AlarmService";
     private static final String PREF_NAME = "alarms_pref";
     private static final String ALARMS_KEY = "alarms_list";
 
@@ -33,9 +32,9 @@ public class DeleteAlarmService {
         this.gson = new Gson();
     }
 
-    public AlarmData addAlarm(String startTime, String className, int advanceMinutes,
-                              boolean vibration) {
-        AlarmData alarm = new AlarmData();
+    public DeleteAlarmData addAlarm(String startTime, String className, int advanceMinutes,
+                                    boolean vibration) {
+        DeleteAlarmData alarm = new DeleteAlarmData();
         alarm.setId(UUID.randomUUID().toString());
         alarm.setStartTime(startTime);
         alarm.setClassName(className);
@@ -44,7 +43,7 @@ public class DeleteAlarmService {
         alarm.setActive(true);
 
         // Save to storage
-        List<AlarmData> alarms = getAlarms();
+        List<DeleteAlarmData> alarms = getAlarms();
         alarms.add(alarm);
         saveAlarms(alarms);
 
@@ -54,8 +53,8 @@ public class DeleteAlarmService {
         return alarm;
     }
 
-    public void updateAlarm(AlarmData alarm) {
-        List<AlarmData> alarms = getAlarms();
+    public void updateAlarm(DeleteAlarmData alarm) {
+        List<DeleteAlarmData> alarms = getAlarms();
         for (int i = 0; i < alarms.size(); i++) {
             if (alarms.get(i).getId().equals(alarm.getId())) {
                 alarms.set(i, alarm);
@@ -74,7 +73,7 @@ public class DeleteAlarmService {
     }
 
     public void deleteAlarm(String alarmId) {
-        List<AlarmData> alarms = getAlarms();
+        List<DeleteAlarmData> alarms = getAlarms();
         for (int i = 0; i < alarms.size(); i++) {
             if (alarms.get(i).getId().equals(alarmId)) {
                 alarms.remove(i);
@@ -86,8 +85,8 @@ public class DeleteAlarmService {
     }
 
     public void toggleAlarm(String alarmId, boolean active) {
-        List<AlarmData> alarms = getAlarms();
-        for (AlarmData alarm : alarms) {
+        List<DeleteAlarmData> alarms = getAlarms();
+        for (DeleteAlarmData alarm : alarms) {
             if (alarm.getId().equals(alarmId)) {
                 alarm.setActive(active);
                 
@@ -103,22 +102,22 @@ public class DeleteAlarmService {
         saveAlarms(alarms);
     }
 
-    public List<AlarmData> getAlarms() {
+    public List<DeleteAlarmData> getAlarms() {
         String alarmsJson = sharedPreferences.getString(ALARMS_KEY, null);
         if (alarmsJson == null) {
             return new ArrayList<>();
         }
 
-        Type type = new TypeToken<List<AlarmData>>(){}.getType();
+        Type type = new TypeToken<List<DeleteAlarmData>>(){}.getType();
         return gson.fromJson(alarmsJson, type);
     }
 
-    private void saveAlarms(List<AlarmData> alarms) {
+    private void saveAlarms(List<DeleteAlarmData> alarms) {
         String alarmsJson = gson.toJson(alarms);
         sharedPreferences.edit().putString(ALARMS_KEY, alarmsJson).apply();
     }
 
-    public void scheduleAlarm(AlarmData alarm) {
+    public void scheduleAlarm(DeleteAlarmData alarm) {
         Intent intent = new Intent(context, NotificationsBroadcastReceiver.class);
         intent.putExtra("alarmOrNotification", "alarm");
         intent.putExtra("className", alarm.getClassName());
@@ -145,12 +144,12 @@ public class DeleteAlarmService {
             if (alarmManager != null) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
                         System.currentTimeMillis() + delayMillis, pendingIntent);
-                Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in "
-                        + alarm.getAdvanceMinutes() + " minutes");
+                // Log.d(TAG, "Alarm scheduled: " + alarm.getClassName() + " in "
+                //        + alarm.getAdvanceMinutes() + " minutes");
             }
-        } else {
-            Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
-        }
+        } // else {
+        // Log.w(TAG, "Alarm time is in the past: " + alarm.getClassName());
+        // }
     }
 
     public void cancelAlarm(String id) {
@@ -167,18 +166,18 @@ public class DeleteAlarmService {
             if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);
                 pendingIntent.cancel();
-                Log.d(TAG, "Alarm canceled: " + id);
+                // Log.d(TAG, "Alarm canceled: " + id);
             }
         }
     }
 
     public void restoreAllAlarms() {
-        List<AlarmData> alarms = getAlarms();
-        for (AlarmData alarm : alarms) {
+        List<DeleteAlarmData> alarms = getAlarms();
+        for (DeleteAlarmData alarm : alarms) {
             if (alarm.isActive()) {
                 scheduleAlarm(alarm);
             }
         }
-        Log.d(TAG, "Restored " + alarms.size() + " alarms after reboot");
+        // Log.d(TAG, "Restored " + alarms.size() + " alarms after reboot");
     }
 }

@@ -28,6 +28,6 @@
         android:id="@+id/groupListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="#E0E0E0"
+        android:divider="@color/border_primary"
         android:dividerHeight="1dp" />
 </LinearLayout>

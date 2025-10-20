@@ -26,12 +26,13 @@
         android:text="Class hours"
         android:gravity="center"
         android:textSize="16dp"
+        android:textColor="@color/text_primary"
         android:paddingBottom="8dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#CCCCCC"
+        android:background="@color/border_primary"
         android:layout_marginVertical="8dp" />
 
     <LinearLayout
@@ -51,6 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16dp"
+            android:textColor="@color/text_primary"
             android:text="Type" />
         <TextView
             android:layout_width="wrap_content"
@@ -64,6 +66,7 @@
             android:id="@+id/professorName"
             android:layout_width="wrap_content"
             android:textSize="16dp"
+            android:textColor="@color/text_primary"
             android:layout_height="wrap_content"
             android:text="Name" />
         <TextView
@@ -79,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16dp"
+            android:textColor="@color/text_primary"
             android:text="cabinet" />
         <TextView
             android:layout_width="wrap_content"
@@ -93,6 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16dp"
+            android:textColor="@color/text_primary"
             android:text="number" />
     </LinearLayout>
 

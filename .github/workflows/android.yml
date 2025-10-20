@@ -3,16 +3,12 @@ permissions:
   contents: read
   
 on:
-  push:
-    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "dev" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    environment: dev
     steps:
     - uses: actions/checkout@v4
     - name: set up JDK 17
@@ -34,7 +30,7 @@ jobs:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         STRORE_FILE: ${{secrets.STRORE_FILE}}
       run: echo "$KEYSTORE_BASE64" | base64 --decode > app/debug-key.jks
-    - name: Set up keystore
+    - name: Set up keystore Debug
       env:
           KEY_ALIAS: ${{secrets.KEY_ALIAS}}
           KEY_PASSWORD: ${{secrets.KEY_PASSWORD}}
@@ -44,6 +40,16 @@ jobs:
           echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
           echo "storePassword=$STORE_PASSWORD" >> keystore.properties
           echo "storeFile=debug-key.jks" >> keystore.properties
+    - name: Set up keystore Release
+      env:
+        KEY_ALIAS: ${{secrets.KEY_ALIAS}}
+        KEY_PASSWORD: ${{secrets.KEY_PASSWORD}}
+        STORE_PASSWORD: ${{secrets.STORE_PASSWORD}}
+      run: |
+        echo "keyAlias=$KEY_ALIAS" > keystore.properties.release
+        echo "keyPassword=$KEY_PASSWORD" >> keystore.properties.release
+        echo "storePassword=$STORE_PASSWORD" >> keystore.properties.release
+        echo "storeFile=debug-key.jks" >> keystore.properties.release
     - name: Set up env
       env:
           MSAL_HOST: ${{secrets.MSAL_HOST}}

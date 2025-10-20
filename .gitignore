@@ -2,6 +2,7 @@
 .idea
 .gradle
 local.properties
+keystore.properties.release
 keystore.properties
 build
 app/src/main/assets/env
@@ -9,3 +10,4 @@ app/src/main/assets/env
 app/src/main/res/raw/auth_config_single_account.json
 app/release/
 *android-keystore
+.secrets

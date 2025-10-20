@@ -6,45 +6,42 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationsBroadcastReceiver extends BroadcastReceiver {
 
-    public static final String CHANNEL_ID = "5555";
+    private static final String CHANNEL_ID = "class_notifications";
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Override
     public void onReceive(Context context, Intent intent) {
         String className = intent.getStringExtra("className");
-        int advanceMinutes = intent.getIntExtra("advance", 0);
-        sendNotification(context, className, advanceMinutes);
-    }
+        int advance = intent.getIntExtra("advance", 0);
+        if (advance <= 0) {
+            return;
+        }
 
-    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private void sendNotification(Context context, String className, int advanceMinutes) {
-        NotificationManager notificationManager = context.getSystemService(
-                NotificationManager.class);
-
-        if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
+        NotificationManager nm = context.getSystemService(NotificationManager.class);
+        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "Class Notifications",
                     NotificationManager.IMPORTANCE_HIGH
             );
-            notificationManager.createNotificationChannel(channel);
+            channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            nm.createNotificationChannel(channel);
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
-                .setContentText(className + " starts in " + advanceMinutes + " minutes")
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setContentText(className + " starts in " + advance + " minutes")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         NotificationManagerCompat.from(context).notify(className.hashCode(), builder.build());

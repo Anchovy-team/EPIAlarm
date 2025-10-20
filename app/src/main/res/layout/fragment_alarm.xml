@@ -3,16 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:padding="24dp">
+    android:background="@color/background_primary"
+    android:paddingTop="24dp"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp">
 
     <LinearLayout
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="48dp"
-        android:paddingBottom="32dp">
+        android:paddingTop="50dp">
 
         <TextView
             android:id="@+id/config_title"
@@ -21,7 +22,7 @@
             android:text="Alarm Configuration"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -30,70 +31,174 @@
             android:layout_height="wrap_content"
             android:text="Set advance times before lessons: alarm for the first one, reminder for the rest."
             android:textSize="14sp"
-            android:textColor="#666666"
+            android:textColor="@color/text_tertiary"
             android:layout_marginBottom="32dp"
             android:textAlignment="center" />
 
-        <RadioGroup
-            android:id="@+id/modeRadioGroup"
+        <!-- Apple-like Mode Selector -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="28dp">
+            android:layout_marginBottom="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/card_background">
 
-            <RadioButton
-                android:id="@+id/radioAlarm"
-                android:layout_width="wrap_content"
+            <RadioGroup
+                android:id="@+id/modeRadioGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alarm"
-                android:checked="true"
-                android:layout_marginEnd="32dp"
-                app:buttonTint="#1E63FF"
-                android:textColor="@android:color/black" />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="16dp">
 
-            <RadioButton
-                android:id="@+id/radioReminder"
-                android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/radioAlarm"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Alarm"
+                    android:checked="true"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    app:buttonTint="@color/accent_primary" />
+
+                <RadioButton
+                    android:id="@+id/radioReminder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reminder"
+                    android:layout_marginStart="8dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    app:buttonTint="@color/accent_primary" />
+            </RadioGroup>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Apple-like Time Picker Container -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/surface_primary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Reminder"
-                app:buttonTint="#1E63FF"
-                android:textColor="@android:color/black" />
-        </RadioGroup>
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="24dp">
 
+                <!-- Hours Picker -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hours"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_tertiary"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <NumberPicker
+                        android:id="@+id/hourPicker"
+                        android:layout_width="120dp"
+                        android:layout_height="160dp"
+                        android:textSize="32sp"
+                        android:textColor="@color/text_primary" />
+
+                </LinearLayout>
+
+                <!-- Separator -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=":"
+                    android:textSize="32sp"
+                    android:textColor="@color/text_tertiary"
+                    android:textStyle="bold"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Minutes Picker -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Minutes"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_tertiary"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <NumberPicker
+                        android:id="@+id/minutePicker"
+                        android:layout_width="120dp"
+                        android:layout_height="160dp"
+                        android:textSize="32sp"
+                        android:textColor="@color/text_primary" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Apple-like Buttons -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="28dp">
+            android:orientation="vertical"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="16dp">
 
-            <NumberPicker
-                android:id="@+id/hourPicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp" />
+            <Button
+                android:id="@+id/saveSettingsButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Save Settings"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/button_primary_background"
+                android:layout_marginBottom="12dp" />
 
-            <NumberPicker
-                android:id="@+id/minutePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/openAlarmsButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="View Scheduled Alarms"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/accent_primary"
+                android:background="@drawable/button_secondary_background"
+                android:textAllCaps="false" />
+
         </LinearLayout>
-
-        <Button
-            android:id="@+id/saveSettingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save Settings" />
-
-        <Button
-            android:id="@+id/openAlarmsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View Scheduled Alarms"
-            android:textAllCaps="false"
-            android:backgroundTint="#1E63FF"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="12dp" />
 
     </LinearLayout>
 </ScrollView>

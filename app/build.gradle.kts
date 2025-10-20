@@ -1,13 +1,19 @@
 import java.util.Properties
 
 val localProperties = Properties()
+val keyStorePropertiesDebug = Properties()
 val keyStoreProperties = Properties()
 
 val localPropertiesFile = rootProject.file("local.properties")
-val keyStorePropertiesFile = rootProject.file("keystore.properties")
+val keyStorePropertiesDebugFile = rootProject.file("keystore.properties")
+val keyStorePropertiesFile = rootProject.file("keystore.properties.release")
 
 if (localPropertiesFile.exists()) {
     localProperties.load(localPropertiesFile.inputStream())
+}
+
+if (keyStorePropertiesDebugFile.exists()){
+    keyStorePropertiesDebug.load(keyStorePropertiesDebugFile.inputStream())
 }
 
 if (keyStorePropertiesFile.exists()){
@@ -21,6 +27,12 @@ plugins {
 android {
     signingConfigs {
         getByName("debug") {
+            storeFile = keyStorePropertiesDebug["storeFile"]?.let { file(it as String) }
+            storePassword = keyStorePropertiesDebug["storePassword"] as String?
+            keyAlias = keyStorePropertiesDebug["keyAlias"] as String?
+            keyPassword = keyStorePropertiesDebug["keyPassword"] as String?
+        }
+        create("release") {
             storeFile = keyStoreProperties["storeFile"]?.let { file(it as String) }
             storePassword = keyStoreProperties["storePassword"] as String?
             keyAlias = keyStoreProperties["keyAlias"] as String?
@@ -48,11 +60,18 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("release")
+            enableAndroidTestCoverage = false
         }
     }
 

@@ -27,24 +27,33 @@
         android:usesCleartextTraffic="true"
         android:name=".EpiAlarmApp"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".NotificationsBroadcastReceiver" />
-        <receiver android:name=".receiver.BootCompletedReceiver"
+        <receiver
+            android:name=".NotificationsBroadcastReceiver"
+            android:exported="true" />
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:exported="true" />
+
+        <receiver
+            android:name=".receiver.DeleteBootCompletedReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name="com.microsoft.identity.client.BrowserTabActivity"
             android:exported="true">
@@ -57,10 +66,16 @@
                     android:path="${msalPath}" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".AlarmOverlayService"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback"/>
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="anchovy.team.epialarm.ALARM_SERVICE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

@@ -16,8 +16,8 @@
         <!-- Handle system UI properly -->
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:navigationBarColor">@android:color/white</item>
-        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:navigationBarColor">@color/background_primary</item>
+        <item name="android:statusBarColor">@color/background_primary</item>
         <!-- Bottom Navigation Colors -->
         <item name="android:colorPrimary">@color/nav_background</item>
         <item name="colorPrimary">@color/nav_background</item>
