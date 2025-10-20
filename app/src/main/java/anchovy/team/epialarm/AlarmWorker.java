@@ -18,7 +18,7 @@ public class AlarmWorker extends Worker {
     @Override
     public Result doWork() {
         try {
-            SchedulePlanner.scheduleForToday(getApplicationContext());
+            SchedulePlanner.scheduleForTomorrow(getApplicationContext());
             return Result.success();
         } catch (Exception e) {
             e.printStackTrace();

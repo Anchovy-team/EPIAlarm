@@ -25,6 +25,8 @@ import androidx.fragment.app.Fragment;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -150,6 +152,10 @@ public class AlarmFragment extends Fragment {
         //setAlarm("2025-10-19T01:00:00.0Z", "Intro to Javascript");
         //setNotification("2025-10-19T01:00:00.0Z", "IAM Fundamentals");
         SchedulePlanner.scheduleForToday(context);
+        LocalTime now = LocalTime.now(ZoneId.of("Europe/Paris"));
+        if (now.isAfter(LocalTime.NOON)) {
+            SchedulePlanner.scheduleForTomorrow(context);
+        }
     }
 
     private void openScheduledList() {
@@ -169,7 +175,7 @@ public class AlarmFragment extends Fragment {
         long now = System.currentTimeMillis();
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(now);
-        cal.set(Calendar.HOUR_OF_DAY, 3);
+        cal.set(Calendar.HOUR_OF_DAY, 12);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         if (cal.getTimeInMillis() < now) {

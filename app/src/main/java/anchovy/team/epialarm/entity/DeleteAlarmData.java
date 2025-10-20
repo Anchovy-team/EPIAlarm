@@ -2,7 +2,7 @@ package anchovy.team.epialarm.entity;
 
 import java.io.Serializable;
 
-public class AlarmData implements Serializable {
+public class DeleteAlarmData implements Serializable {
     private String id;
     private String startTime;
     private String className;
@@ -10,11 +10,11 @@ public class AlarmData implements Serializable {
     private boolean vibration;
     private boolean active;
 
-    public AlarmData() {
+    public DeleteAlarmData() {
     }
 
-    public AlarmData(String id, String startTime,
-                     String className, int advanceMinutes, boolean vibration, boolean active) {
+    public DeleteAlarmData(String id, String startTime,
+                           String className, int advanceMinutes, boolean vibration, boolean active) {
         this.id = id;
         this.startTime = startTime;
         this.className = className;

@@ -2,7 +2,6 @@ package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.models.Reservation;
 import android.app.AlarmManager;
-import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -11,11 +10,9 @@ import android.os.Build;
 import android.provider.Settings;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,24 +20,30 @@ public final class SchedulePlanner {
 
     private SchedulePlanner() {}
 
+    private static final ZoneId ZONE_PARIS = ZoneId.of("Europe/Paris");
+
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public static void scheduleForToday(Context context) {
+        scheduleForDate(context, LocalDate.now(ZONE_PARIS));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    public static void scheduleForTomorrow(Context context) {
+        scheduleForDate(context, LocalDate.now(ZONE_PARIS).plusDays(1));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    public static void scheduleForDate(Context context, LocalDate targetDate) {
         UserSession session = UserSession.getInstance(context);
 
-        Application app = (Application) context.getApplicationContext();
-        TimetableViewModel viewModel = new ViewModelProvider.AndroidViewModelFactory(app)
-                .create(TimetableViewModel.class);
-
-        List<Reservation> allReservations = viewModel.reservations;
+        List<Reservation> allReservations = ScheduleRepository.getInstance()
+                .fetchReservations(context).join();
         if (allReservations == null || allReservations.isEmpty()) {
             return;
         }
 
-        ZoneId zone = ZoneId.of("Europe/Paris");
-        LocalDate today = LocalDate.now(zone);
-
         List<Reservation> todayReservations = allReservations.stream()
-                .filter(r -> r.getStartDate().toLocalDate().equals(today))
+                .filter(r -> r.getStartDate().toLocalDate().equals(targetDate))
                 .sorted(Comparator.comparing(Reservation::getStartDate))
                 .toList();
 
@@ -53,7 +56,7 @@ public final class SchedulePlanner {
             setAlarm(
                     context,
                     session,
-                    firstClass.getStartDate().atZone(zone).toInstant().toString(),
+                    firstClass.getStartDate(),
                     firstClass.getName()
             );
         }
@@ -69,21 +72,23 @@ public final class SchedulePlanner {
                     .forEach(r -> setNotification(
                             context,
                             session,
-                            r.getStartDate().atZone(zone).toInstant().toString(),
+                            r.getStartDate(),
                             r.getName()
                     ));
         }
     }
 
-    private static void setAlarm(Context context, UserSession session, String startTimeIso,
+    private static void setAlarm(Context context, UserSession session, LocalDateTime startTimeUTC,
                                  String className) {
         int advance = session.getAdvanceMinutesAlarm();
         if (advance <= 0) {
             return;
         }
 
-        long triggerAt = Instant.parse(startTimeIso)
-                .minus(advance, ChronoUnit.MINUTES)
+        long triggerAt = startTimeUTC.atZone(ZoneId.of("UTC"))
+                .withZoneSameInstant(ZoneId.of("Europe/Paris"))
+                .minusMinutes(advance)
+                .toInstant()
                 .toEpochMilli();
         if (triggerAt < System.currentTimeMillis()) {
             return;
@@ -101,15 +106,17 @@ public final class SchedulePlanner {
         am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
-    private static void setNotification(Context context, UserSession session, String startTimeIso,
-                                        String className) {
+    private static void setNotification(Context context, UserSession session,
+                                        LocalDateTime startTimeUTC, String className) {
         int advance = session.getAdvanceMinutesReminder();
         if (advance <= 0) {
             return;
         }
 
-        long triggerAt = Instant.parse(startTimeIso)
-                .minus(advance, ChronoUnit.MINUTES)
+        long triggerAt = startTimeUTC.atZone(ZoneId.of("UTC"))
+                .withZoneSameInstant(ZoneId.of("Europe/Paris"))
+                .minusMinutes(advance)
+                .toInstant()
                 .toEpochMilli();
         if (triggerAt < System.currentTimeMillis()) {
             return;
