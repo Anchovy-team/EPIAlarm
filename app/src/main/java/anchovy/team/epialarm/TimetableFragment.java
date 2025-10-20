@@ -157,7 +157,7 @@ public class TimetableFragment extends Fragment {
         }
 
         for (Reservation r : reservations) {
-            System.out.println(r.getName());
+            //System.out.println(r.getName());
             ZoneId parisZone = ZoneId.of("Europe/Paris");
             ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
                     .withZoneSameInstant(parisZone);
