@@ -13,8 +13,8 @@ public class DeleteAlarmData implements Serializable {
     public DeleteAlarmData() {
     }
 
-    public DeleteAlarmData(String id, String startTime,
-                           String className, int advanceMinutes, boolean vibration, boolean active) {
+    public DeleteAlarmData(String id, String startTime, String className, int advanceMinutes,
+                           boolean vibration, boolean active) {
         this.id = id;
         this.startTime = startTime;
         this.className = className;

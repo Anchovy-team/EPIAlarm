@@ -1,13 +1,13 @@
 package anchovy.team.epialarm;
 
+import anchovy.team.epialarm.zeus.client.ZeusApiClient;
+import anchovy.team.epialarm.zeus.models.Reservation;
+import anchovy.team.epialarm.zeus.services.ReservationService;
 import android.content.Context;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import anchovy.team.epialarm.zeus.client.ZeusApiClient;
-import anchovy.team.epialarm.zeus.models.Reservation;
-import anchovy.team.epialarm.zeus.services.ReservationService;
 
 public class ScheduleRepository {
 
@@ -46,10 +46,12 @@ public class ScheduleRepository {
 
         if ("group".equals(session.getChosenType())) {
             List<Long> groups = List.of(session.getGroupId());
-            return reservationService.getReservationsByFilter(groups, List.of(), List.of(), from, to);
+            return reservationService.getReservationsByFilter(groups, List.of(), List.of(), from,
+                    to);
         } else if ("teacher".equals(session.getChosenType())) {
             List<Long> teachers = List.of(session.getTeacherId());
-            return reservationService.getReservationsByFilter(List.of(), List.of(), teachers, from, to);
+            return reservationService.getReservationsByFilter(List.of(), List.of(), teachers, from,
+                    to);
         }
 
         return CompletableFuture.completedFuture(new ArrayList<>());

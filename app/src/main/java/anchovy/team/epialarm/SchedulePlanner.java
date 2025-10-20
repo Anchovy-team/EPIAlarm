@@ -78,14 +78,14 @@ public final class SchedulePlanner {
         }
     }
 
-    private static void setAlarm(Context context, UserSession session, LocalDateTime startTimeUTC,
+    private static void setAlarm(Context context, UserSession session, LocalDateTime startTimeUtc,
                                  String className) {
         int advance = session.getAdvanceMinutesAlarm();
         if (advance <= 0) {
             return;
         }
 
-        long triggerAt = startTimeUTC.atZone(ZoneId.of("UTC"))
+        long triggerAt = startTimeUtc.atZone(ZoneId.of("UTC"))
                 .withZoneSameInstant(ZoneId.of("Europe/Paris"))
                 .minusMinutes(advance)
                 .toInstant()
@@ -107,13 +107,13 @@ public final class SchedulePlanner {
     }
 
     private static void setNotification(Context context, UserSession session,
-                                        LocalDateTime startTimeUTC, String className) {
+                                        LocalDateTime startTimeUtc, String className) {
         int advance = session.getAdvanceMinutesReminder();
         if (advance <= 0) {
             return;
         }
 
-        long triggerAt = startTimeUTC.atZone(ZoneId.of("UTC"))
+        long triggerAt = startTimeUtc.atZone(ZoneId.of("UTC"))
                 .withZoneSameInstant(ZoneId.of("Europe/Paris"))
                 .minusMinutes(advance)
                 .toInstant()
