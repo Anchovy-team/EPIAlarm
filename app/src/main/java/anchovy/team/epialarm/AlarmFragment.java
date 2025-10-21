@@ -115,6 +115,7 @@ public class AlarmFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private void onSaveClicked() {
+        Toast.makeText(context, "Preferences saved!", Toast.LENGTH_LONG).show();
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
         boolean alarmMode = radioAlarm.isChecked();
         if (alarmMode) {
