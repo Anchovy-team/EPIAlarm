@@ -1,6 +1,7 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.utils.NumberPickerHelper;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +19,6 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -85,7 +85,6 @@ public class AlarmFragment extends Fragment {
         scheduleDailyWork();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -113,7 +112,6 @@ public class AlarmFragment extends Fragment {
         return v;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private void onSaveClicked() {
         Toast.makeText(context, "Preferences saved!", Toast.LENGTH_LONG).show();
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
@@ -145,9 +143,10 @@ public class AlarmFragment extends Fragment {
                         "Notifications can not be sent, because you denied notification request",
                         Toast.LENGTH_LONG).show();
             } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                }
             }
-
         }
 
         //setAlarm("2025-10-19T01:00:00.0Z", "Intro to Javascript");
