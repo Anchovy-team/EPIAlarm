@@ -43,7 +43,7 @@ public class ScheduleRepository {
         }
 
         LocalDateTime from = LocalDate.now().atStartOfDay();
-        LocalDateTime to = LocalDateTime.now().plusWeeks(1);
+        LocalDateTime to = LocalDateTime.now().plusWeeks(4);
 
         if ("group".equals(session.getChosenType())) {
             List<Long> groups = List.of(session.getGroupId());

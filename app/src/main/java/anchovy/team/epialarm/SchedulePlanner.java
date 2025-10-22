@@ -1,6 +1,8 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.models.Reservation;
+
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -8,13 +10,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class SchedulePlanner {
 
@@ -22,17 +24,14 @@ public final class SchedulePlanner {
 
     private static final ZoneId ZONE_PARIS = ZoneId.of("Europe/Paris");
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public static void scheduleForToday(Context context) {
         scheduleForDate(context, LocalDate.now(ZONE_PARIS));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public static void scheduleForTomorrow(Context context) {
         scheduleForDate(context, LocalDate.now(ZONE_PARIS).plusDays(1));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public static void scheduleForDate(Context context, LocalDate targetDate) {
         UserSession session = UserSession.getInstance(context);
 
@@ -45,7 +44,7 @@ public final class SchedulePlanner {
         List<Reservation> todayReservations = allReservations.stream()
                 .filter(r -> r.getStartDate().toLocalDate().equals(targetDate))
                 .sorted(Comparator.comparing(Reservation::getStartDate))
-                .toList();
+                .collect(Collectors.toList());
 
         if (todayReservations.isEmpty()) {
             return;
@@ -61,10 +60,13 @@ public final class SchedulePlanner {
             );
         }
 
-        boolean canNotify = ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED;
+        boolean canNotify = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            canNotify = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED;
+        }
 
         if (canNotify) {
             todayReservations.stream()
