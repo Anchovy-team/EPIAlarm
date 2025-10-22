@@ -1,7 +1,6 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.models.Reservation;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ScheduledListFragment extends Fragment {
 
@@ -35,7 +34,6 @@ public class ScheduledListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_scheduled_list, container, false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -43,7 +41,6 @@ public class ScheduledListFragment extends Fragment {
         loadScheduled();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private void loadScheduled() {
         ZoneId parisZone = ZoneId.of("Europe/Paris");
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm");
@@ -69,7 +66,7 @@ public class ScheduledListFragment extends Fragment {
 
                     List<Reservation> upcoming = reservations.stream()
                             .sorted(Comparator.comparing(Reservation::getStartDate))
-                            .toList();
+                            .collect(Collectors.toList());
 
                     for (Reservation r : upcoming) {
                         LocalDate d = r.getStartDate().toLocalDate();
