@@ -122,24 +122,27 @@ android {
             file("src/main/res/raw/auth_config_apk.json")
         }
 
-        val destinationDir = file("${layout.buildDirectory}/generated/res/raw/${name}")
+        val destinationDir = file("src/main/res/raw/")
         val destinationFileName = "auth_config_single_account.json"
+        if (variantName == "Release") {
+            val copyTask = tasks.register<Copy>("copyAuthConfigFor$variantName") {
+                from(sourceFile)
+                into(destinationDir)
+                rename { destinationFileName }
+            }
 
-        val copyTask = tasks.register<Copy>("copyAuthConfigFor$variantName") {
-            from(sourceFile)
-            into(destinationDir)
-            rename { destinationFileName }
-        }
+            project.tasks.matching {
+                it.name == "map${variantName}SourceSetPaths" ||
+                        it.name == "generate${variantName}Resources" ||
+                        it.name == "preBuild" ||
+                        it.name == "merge${variantName}Resources"
+            }.configureEach {
+                dependsOn(copyTask)
+            }
 
-        project.tasks.matching { it.name == "map${variantName}SourceSetPaths" ||
-                it.name == "generate${variantName}Resources" ||
-                it.name == "preBuild" ||
-                it.name == "merge${variantName}Resources"}.configureEach {
-            dependsOn(copyTask)
-        }
-
-        project.extensions.configure<com.android.build.gradle.AppExtension>("android") {
-            sourceSets.getByName(name).res.srcDir(destinationDir)
+            project.extensions.configure<com.android.build.gradle.AppExtension>("android") {
+                sourceSets.getByName(name).res.srcDir(destinationDir)
+            }
         }
     }
 }
