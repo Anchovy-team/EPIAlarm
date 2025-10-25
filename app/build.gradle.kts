@@ -108,28 +108,37 @@ dependencies {
     implementation ("androidx.work:work-runtime:2.10.4")
 }
 
-afterEvaluate {
-    val isBundleBuild = gradle.startParameter.taskNames.any { it.contains("bundle", ignoreCase = true) }
-
-    val sourceFile = if (isBundleBuild) {
-        file("src/main/res/raw/auth_config_bundle.json")
-    } else {
-        file("src/main/res/raw/auth_config_apk.json")
-    }
-
-    val destinationDir = file("src/main/res/raw")
-    val destinationFileName = "auth_config_single_account.json"
-
-    android.applicationVariants.all {
+android {
+    applicationVariants.all {
         val variantName = name.replaceFirstChar { it.uppercase() }
-        val copyTaskName = "copyAuthConfigFor$variantName"
 
-        tasks.register<Copy>(copyTaskName) {
+        val isBundleBuild = gradle.startParameter.taskNames.any {
+            it.contains("bundle", ignoreCase = true)
+        }
+
+        val sourceFile = if (isBundleBuild) {
+            file("src/main/res/raw/auth_config_bundle.json")
+        } else {
+            file("src/main/res/raw/auth_config_apk.json")
+        }
+
+        val destinationDir = file("${layout.buildDirectory}/generated/res/raw/${name}")
+        val destinationFileName = "auth_config_single_account.json"
+
+        val copyTask = tasks.register<Copy>("copyAuthConfigFor$variantName") {
             from(sourceFile)
             into(destinationDir)
             rename { destinationFileName }
         }
 
-        preBuild.dependsOn(copyTaskName)
+        project.tasks.matching { it.name == "map${variantName}SourceSetPaths" ||
+                it.name == "generate${variantName}Resources" ||
+                it.name == "preBuild" }.configureEach {
+            dependsOn(copyTask)
+        }
+
+        project.extensions.configure<com.android.build.gradle.AppExtension>("android") {
+            sourceSets.getByName(name).res.srcDir(destinationDir)
+        }
     }
 }
