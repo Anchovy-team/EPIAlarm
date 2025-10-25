@@ -48,14 +48,16 @@ android {
         applicationId = "anchovy.team.epialarm"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 4
+        versionName = "0.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         signingConfig = signingConfigs.getByName("debug")
+        val isBundleBuild = gradle.startParameter.taskNames.any { it.contains("bundle", ignoreCase = true) }
+        val selectedSignature = if (isBundleBuild) localProperties.getProperty("MSAL_PATH_BUNDLE") else localProperties.getProperty("MSAL_PATH")
 
         manifestPlaceholders["msalHost"] = localProperties.getProperty("MSAL_HOST")
-        manifestPlaceholders["msalPath"] = localProperties.getProperty("MSAL_PATH")
+        manifestPlaceholders["msalPath"] = selectedSignature
     }
 
     buildFeatures {
@@ -93,9 +95,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
@@ -105,4 +106,43 @@ dependencies {
     implementation ("com.microsoft.identity.client:msal:5.1.0")
     implementation ("com.android.volley:volley:1.2.1")
     implementation ("androidx.work:work-runtime:2.10.4")
+}
+
+android {
+    applicationVariants.all {
+        val variantName = name.replaceFirstChar { it.uppercase() }
+
+        val isBundleBuild = gradle.startParameter.taskNames.any {
+            it.contains("bundle", ignoreCase = true)
+        }
+
+        val sourceFile = if (isBundleBuild) {
+            file("src/main/res/raw/auth_config_bundle.json")
+        } else {
+            file("src/main/res/raw/auth_config_apk.json")
+        }
+
+        val destinationDir = file("src/main/res/raw/")
+        val destinationFileName = "auth_config_single_account.json"
+        if (variantName == "Release") {
+            val copyTask = tasks.register<Copy>("copyAuthConfigFor$variantName") {
+                from(sourceFile)
+                into(destinationDir)
+                rename { destinationFileName }
+            }
+
+            project.tasks.matching {
+                it.name == "map${variantName}SourceSetPaths" ||
+                        it.name == "generate${variantName}Resources" ||
+                        it.name == "preBuild" ||
+                        it.name == "merge${variantName}Resources"
+            }.configureEach {
+                dependsOn(copyTask)
+            }
+
+            project.extensions.configure<com.android.build.gradle.AppExtension>("android") {
+                sourceSets.getByName(name).res.srcDir(destinationDir)
+            }
+        }
+    }
 }
