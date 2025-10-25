@@ -133,7 +133,8 @@ android {
 
         project.tasks.matching { it.name == "map${variantName}SourceSetPaths" ||
                 it.name == "generate${variantName}Resources" ||
-                it.name == "preBuild" }.configureEach {
+                it.name == "preBuild" ||
+                it.name == "merge${variantName}Resources"}.configureEach {
             dependsOn(copyTask)
         }
 
