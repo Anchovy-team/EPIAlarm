@@ -35,4 +35,11 @@
     <!-- Card Colors -->
     <color name="card_background">#2C2C2E</color>
     <color name="card_elevation">#000000</color>
+
+    <!-- Dialog button colors -->
+    <color name="allow_button">#90CAF9</color>
+    <color name="allow_button_pressed">#64B5F6</color>
+
+    <color name="cancel_button">#EF9A9A</color>
+    <color name="cancel_button_pressed">#E57373</color>
 </resources>
