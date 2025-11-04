@@ -3,6 +3,8 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.TeacherService;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,18 +25,19 @@ public class SearchTeacherFragment extends DialogFragment {
     private List<Teacher> allTeachers;
     private List<String> teacherNames = new ArrayList<>();
     private UserSession session;
+    private Context context;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        context = requireContext();
         View view = inflater.inflate(R.layout.fragment_search_teacher, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint("Search teacher...");
 
-        session = UserSession.getInstance(requireContext());
+        session = UserSession.getInstance(context);
         TeachersViewModel teachersViewModel = new ViewModelProvider(requireActivity()).get(
                 TeachersViewModel.class);
 
@@ -80,8 +83,8 @@ public class SearchTeacherFragment extends DialogFragment {
         super.onStart();
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(
-                    (int) (requireContext().getResources().getDisplayMetrics().widthPixels * 0.8),
-                    (int) (requireContext().getResources().getDisplayMetrics().heightPixels * 0.5)
+                    (int) (context.getResources().getDisplayMetrics().widthPixels * 0.8),
+                    (int) (context.getResources().getDisplayMetrics().heightPixels * 0.5)
             );
             getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
@@ -99,7 +102,7 @@ public class SearchTeacherFragment extends DialogFragment {
         ListView listView = view.findViewById(R.id.groupListView);
 
         if (adapter == null) {
-            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1,
+            adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,
                     filteredTeachers);
             listView.setAdapter(adapter);
         } else {
