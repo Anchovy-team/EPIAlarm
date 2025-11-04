@@ -1,6 +1,7 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.models.Reservation;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,10 +28,12 @@ import java.util.stream.Collectors;
 public class ScheduledListFragment extends Fragment {
 
     private ListView scheduledList;
+    private Context context;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        context = requireContext();
         return inflater.inflate(R.layout.fragment_scheduled_list, container, false);
     }
 
@@ -46,7 +49,7 @@ public class ScheduledListFragment extends Fragment {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm");
 
         ScheduleRepository.getInstance()
-                .fetchReservations(requireContext())
+                .fetchReservations(context)
                 .thenAccept(reservations -> requireActivity().runOnUiThread(() -> {
 
                     List<Map<String, String>> data = new ArrayList<>();
@@ -61,7 +64,7 @@ public class ScheduledListFragment extends Fragment {
                     LocalDate tomorrow = today.plusDays(1);
                     boolean includeTomorrow = LocalTime.now(parisZone).isAfter(LocalTime.NOON);
 
-                    UserSession session = UserSession.getInstance(requireContext());
+                    UserSession session = UserSession.getInstance(context);
                     Set<LocalDate> alarmAssigned = new HashSet<>();
 
                     List<Reservation> upcoming = reservations.stream()
@@ -112,7 +115,7 @@ public class ScheduledListFragment extends Fragment {
 
     private void setAdapter(List<Map<String, String>> data) {
         SimpleAdapter adapter = new SimpleAdapter(
-                requireContext(),
+                context,
                 data,
                 R.layout.item_today_event,
                 new String[]{"title", "time", "type"},
