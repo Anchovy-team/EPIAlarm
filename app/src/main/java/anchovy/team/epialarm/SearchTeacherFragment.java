@@ -3,7 +3,6 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Teacher;
 import anchovy.team.epialarm.zeus.services.TeacherService;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;

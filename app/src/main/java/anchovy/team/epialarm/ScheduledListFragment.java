@@ -1,7 +1,6 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.models.Reservation;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;

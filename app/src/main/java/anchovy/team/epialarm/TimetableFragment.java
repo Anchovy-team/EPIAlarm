@@ -4,7 +4,6 @@ import anchovy.team.epialarm.zeus.models.Group;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import anchovy.team.epialarm.zeus.models.Room;
 import anchovy.team.epialarm.zeus.models.Teacher;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
