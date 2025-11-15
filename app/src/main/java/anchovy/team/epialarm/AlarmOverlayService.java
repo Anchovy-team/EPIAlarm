@@ -62,26 +62,28 @@ public class AlarmOverlayService extends Service {
         }
 
         String className = intent.getStringExtra("className");
+        String rooms = intent.getStringExtra("rooms");
         int advance = intent.getIntExtra("advance", 0);
         if (advance <= 0) {
             stopSelf();
             return START_NOT_STICKY;
         }
 
-        showOverlay(className, advance);
+        showOverlay(className, advance, rooms);
         return START_STICKY;
     }
 
-    private void showOverlay(String className, int advance) {
+    private void showOverlay(String className, int advance, String rooms) {
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         overlay = LayoutInflater.from(this).inflate(R.layout.alarm_overlay, null);
 
         ((TextView) overlay.findViewById(R.id.textTitle)).setText(className);
         ((TextView) overlay.findViewById(R.id.textCountdown))
-                .setText(String.format("In %d minutes", advance));
+                .setText(String.format("In %d minutes in %s", advance, rooms));
 
-        overlay.findViewById(R.id.btnClose).setOnClickListener(v -> close(false, null));
-        overlay.findViewById(R.id.btnPostpone).setOnClickListener(v -> close(true, className));
+        overlay.findViewById(R.id.btnClose).setOnClickListener(v -> close(false, null, null));
+        overlay.findViewById(R.id.btnPostpone).setOnClickListener(v ->
+                close(true, className, rooms));
 
         int flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -135,7 +137,7 @@ public class AlarmOverlayService extends Service {
         }
     }
 
-    private void close(boolean postpone, String className) {
+    private void close(boolean postpone, String className, String rooms) {
         stopAlarm();
         if (overlay != null) {
             overlay.animate().alpha(0f).scaleX(0.8f).scaleY(0.8f)
@@ -148,13 +150,13 @@ public class AlarmOverlayService extends Service {
                         }
                         overlay = null;
                         if (postpone && className != null) {
-                            scheduleSnooze(className, POSTPONE_MIN);
+                            scheduleSnooze(className, POSTPONE_MIN, rooms);
                         }
                         stopSelf();
                     }).start();
         } else {
             if (postpone && className != null) {
-                scheduleSnooze(className, POSTPONE_MIN);
+                scheduleSnooze(className, POSTPONE_MIN, rooms);
             }
             stopSelf();
         }
@@ -182,7 +184,7 @@ public class AlarmOverlayService extends Service {
         }
     }
 
-    private void scheduleSnooze(String className, int minutes) {
+    private void scheduleSnooze(String className, int minutes, String rooms) {
         if (minutes <= 0) {
             return;
         }
@@ -194,7 +196,8 @@ public class AlarmOverlayService extends Service {
 
         Intent i = new Intent(this, AlarmReceiver.class)
                 .putExtra("className", className)
-                .putExtra("advance", minutes);
+                .putExtra("advance", minutes)
+                .putExtra("rooms", rooms);
 
         int requestCode = ("snooze_" + className).hashCode();
 

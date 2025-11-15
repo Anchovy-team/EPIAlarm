@@ -1,6 +1,7 @@
 package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.zeus.models.Reservation;
+import anchovy.team.epialarm.zeus.models.Room;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,8 +14,11 @@ import androidx.core.content.ContextCompat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class SchedulePlanner {
@@ -32,7 +36,6 @@ public final class SchedulePlanner {
     }
 
     public static void scheduleForDate(Context context, LocalDate targetDate) {
-        UserSession session = UserSession.getInstance(context);
 
         List<Reservation> allReservations = ScheduleRepository.getInstance()
                 .fetchReservations(context).join();
@@ -49,13 +52,33 @@ public final class SchedulePlanner {
             return;
         }
 
-        Reservation firstClass = todayReservations.get(0);
+        Map<LocalDateTime, Reservation> uniqueByTime = new LinkedHashMap<>();
+        for (Reservation r : todayReservations) {
+            LocalDateTime start = r.getStartDate();
+
+            int hour = start.getHour();
+            if (hour <= 2 || hour >= 20) {
+                continue;
+            }
+
+            uniqueByTime.putIfAbsent(start, r);
+        }
+
+        List<Reservation> uniqueReservations = new ArrayList<>(uniqueByTime.values());
+        if (uniqueReservations.isEmpty()) {
+            return;
+        }
+
+        UserSession session = UserSession.getInstance(context);
+
+        Reservation firstClass = uniqueReservations.get(0);
         if (Settings.canDrawOverlays(context)) {
             setAlarm(
                     context,
                     session,
                     firstClass.getStartDate(),
-                    firstClass.getName()
+                    firstClass.getName(),
+                    firstClass.getRooms()
             );
         }
 
@@ -68,19 +91,20 @@ public final class SchedulePlanner {
         }
 
         if (canNotify) {
-            todayReservations.stream()
+            uniqueReservations.stream()
                     .skip(1)
                     .forEach(r -> setNotification(
                             context,
                             session,
                             r.getStartDate(),
-                            r.getName()
+                            r.getName(),
+                            r.getRooms()
                     ));
         }
     }
 
     private static void setAlarm(Context context, UserSession session, LocalDateTime startTimeUtc,
-                                 String className) {
+                                 String className, Room[] rooms) {
         int advance = session.getAdvanceMinutesAlarm();
         if (advance <= 0) {
             return;
@@ -95,9 +119,18 @@ public final class SchedulePlanner {
             return;
         }
 
+        String roomsStr = "";
+        for (Room r : rooms) {
+            roomsStr += r.getName() + ", ";
+        }
+        if (!"".equals(roomsStr)) {
+            roomsStr = roomsStr.substring(0, roomsStr.length() - 2);
+        }
+
         Intent i = new Intent(context, AlarmReceiver.class)
                 .putExtra("className", className)
-                .putExtra("advance", advance);
+                .putExtra("advance", advance)
+                .putExtra("rooms", roomsStr);
 
         PendingIntent pi = PendingIntent.getBroadcast(
                 context, (className + "_alarm").hashCode(),
@@ -107,8 +140,8 @@ public final class SchedulePlanner {
         am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
-    private static void setNotification(Context context, UserSession session,
-                                        LocalDateTime startTimeUtc, String className) {
+    private static void setNotification(Context context, UserSession session, LocalDateTime
+            startTimeUtc, String className, Room[] rooms) {
         int advance = session.getAdvanceMinutesReminder();
         if (advance <= 0) {
             return;
@@ -123,9 +156,18 @@ public final class SchedulePlanner {
             return;
         }
 
+        String roomsStr = "";
+        for (Room r : rooms) {
+            roomsStr += r.getName() + ", ";
+        }
+        if (!"".equals(roomsStr)) {
+            roomsStr = roomsStr.substring(0, roomsStr.length() - 2);
+        }
+
         Intent i = new Intent(context, NotificationsBroadcastReceiver.class)
                 .putExtra("className", className)
-                .putExtra("advance", advance);
+                .putExtra("advance", advance)
+                .putExtra("rooms", roomsStr);
 
         PendingIntent pi = PendingIntent.getBroadcast(
                 context, (className + "_notification").hashCode(),
