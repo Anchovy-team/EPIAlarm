@@ -18,6 +18,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String className = intent.getStringExtra("className");
+        String rooms = intent.getStringExtra("rooms");
         int advance = intent.getIntExtra("advance", 0);
         if (advance <= 0) {
             return;
@@ -37,7 +38,7 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
-                .setContentText(className + " starts in " + advance + " minutes")
+                .setContentText(String.format("%s starts in %d minutes in %s", className, advance, rooms))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
