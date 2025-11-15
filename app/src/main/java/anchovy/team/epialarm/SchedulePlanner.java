@@ -36,7 +36,6 @@ public final class SchedulePlanner {
     }
 
     public static void scheduleForDate(Context context, LocalDate targetDate) {
-        UserSession session = UserSession.getInstance(context);
 
         List<Reservation> allReservations = ScheduleRepository.getInstance()
                 .fetchReservations(context).join();
@@ -69,6 +68,8 @@ public final class SchedulePlanner {
         if (uniqueReservations.isEmpty()) {
             return;
         }
+
+        UserSession session = UserSession.getInstance(context);
 
         Reservation firstClass = uniqueReservations.get(0);
         if (Settings.canDrawOverlays(context)) {
@@ -118,18 +119,18 @@ public final class SchedulePlanner {
             return;
         }
 
-        String rooms_str = "";
+        String roomsStr = "";
         for (Room r : rooms) {
-            rooms_str += r.getName() + ", ";
+            roomsStr += r.getName() + ", ";
         }
-        if (rooms_str != "") {
-            rooms_str = rooms_str.substring(0, rooms_str.length() - 2);
+        if (!"".equals(roomsStr)) {
+            roomsStr = roomsStr.substring(0, roomsStr.length() - 2);
         }
 
         Intent i = new Intent(context, AlarmReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance)
-                .putExtra("rooms", rooms_str);
+                .putExtra("rooms", roomsStr);
 
         PendingIntent pi = PendingIntent.getBroadcast(
                 context, (className + "_alarm").hashCode(),
@@ -139,8 +140,8 @@ public final class SchedulePlanner {
         am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi);
     }
 
-    private static void setNotification(Context context, UserSession session,
-                                        LocalDateTime startTimeUtc, String className, Room[] rooms) {
+    private static void setNotification(Context context, UserSession session, LocalDateTime
+            startTimeUtc, String className, Room[] rooms) {
         int advance = session.getAdvanceMinutesReminder();
         if (advance <= 0) {
             return;
@@ -155,18 +156,18 @@ public final class SchedulePlanner {
             return;
         }
 
-        String rooms_str = "";
+        String roomsStr = "";
         for (Room r : rooms) {
-            rooms_str += r.getName() + ", ";
+            roomsStr += r.getName() + ", ";
         }
-        if (rooms_str != "") {
-            rooms_str = rooms_str.substring(0, rooms_str.length() - 2);
+        if (!"".equals(roomsStr)) {
+            roomsStr = roomsStr.substring(0, roomsStr.length() - 2);
         }
 
         Intent i = new Intent(context, NotificationsBroadcastReceiver.class)
                 .putExtra("className", className)
                 .putExtra("advance", advance)
-                .putExtra("rooms", rooms_str);
+                .putExtra("rooms", roomsStr);
 
         PendingIntent pi = PendingIntent.getBroadcast(
                 context, (className + "_notification").hashCode(),

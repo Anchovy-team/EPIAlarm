@@ -82,7 +82,8 @@ public class AlarmOverlayService extends Service {
                 .setText(String.format("In %d minutes in %s", advance, rooms));
 
         overlay.findViewById(R.id.btnClose).setOnClickListener(v -> close(false, null, null));
-        overlay.findViewById(R.id.btnPostpone).setOnClickListener(v -> close(true, className, rooms));
+        overlay.findViewById(R.id.btnPostpone).setOnClickListener(v ->
+                close(true, className, rooms));
 
         int flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON

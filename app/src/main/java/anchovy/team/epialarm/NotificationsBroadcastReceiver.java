@@ -19,8 +19,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Override
     public void onReceive(Context context, Intent intent) {
-        String className = intent.getStringExtra("className");
-        String rooms = intent.getStringExtra("rooms");
         int advance = intent.getIntExtra("advance", 0);
         if (advance <= 0) {
             return;
@@ -37,6 +35,9 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             nm.createNotificationChannel(channel);
         }
 
+        String className = intent.getStringExtra("className");
+        String rooms = intent.getStringExtra("rooms");
+
         Intent openAppIntent = new Intent(context, MainActivity.class);
         openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -50,7 +51,8 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
-                .setContentText(String.format("%s starts in %d minutes in %s", className, advance, rooms))
+                .setContentText(String.format("%s starts in %d minutes in %s",
+                        className, advance, rooms))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
