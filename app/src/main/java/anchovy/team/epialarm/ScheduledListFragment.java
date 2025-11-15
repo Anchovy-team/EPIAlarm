@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,16 +73,21 @@ public class ScheduledListFragment extends Fragment {
                             .sorted(Comparator.comparing(Reservation::getStartDate))
                             .collect(Collectors.toList());
 
+                    Map<LocalDateTime, Reservation> uniqueByTime = new LinkedHashMap<>();
                     for (Reservation r : upcoming) {
+                        uniqueByTime.putIfAbsent(r.getStartDate(), r);
+                    }
+
+                    for (Reservation r : uniqueByTime.values()) {
                         LocalDate d = r.getStartDate().toLocalDate();
 
                         if (!d.equals(today) && !(includeTomorrow && d.equals(tomorrow))) {
                             continue;
                         }
 
-                        var startParis = r.getStartDate()
-                                .atZone(ZoneId.of("UTC"))
-                                .withZoneSameInstant(parisZone);
+                        if (r.getStartDate().getHour() <= 2 || r.getStartDate().getHour() >= 20) {
+                            continue;
+                        }
 
                         boolean isAlarm = !alarmAssigned.contains(d);
                         if (isAlarm) {
@@ -93,6 +100,10 @@ public class ScheduledListFragment extends Fragment {
                         if (advance <= 0) {
                             continue;
                         }
+
+                        var startParis = r.getStartDate()
+                                .atZone(ZoneId.of("UTC"))
+                                .withZoneSameInstant(parisZone);
 
                         var triggerParis = startParis.minusMinutes(advance);
                         if (triggerParis.toInstant().toEpochMilli() < System.currentTimeMillis()) {

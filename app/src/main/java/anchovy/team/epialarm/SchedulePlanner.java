@@ -14,8 +14,11 @@ import androidx.core.content.ContextCompat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class SchedulePlanner {
@@ -50,7 +53,24 @@ public final class SchedulePlanner {
             return;
         }
 
-        Reservation firstClass = todayReservations.get(0);
+        Map<LocalDateTime, Reservation> uniqueByTime = new LinkedHashMap<>();
+        for (Reservation r : todayReservations) {
+            LocalDateTime start = r.getStartDate();
+
+            int hour = start.getHour();
+            if (hour <= 2 || hour >= 20) {
+                continue;
+            }
+
+            uniqueByTime.putIfAbsent(start, r);
+        }
+
+        List<Reservation> uniqueReservations = new ArrayList<>(uniqueByTime.values());
+        if (uniqueReservations.isEmpty()) {
+            return;
+        }
+
+        Reservation firstClass = uniqueReservations.get(0);
         if (Settings.canDrawOverlays(context)) {
             setAlarm(
                     context,
@@ -70,7 +90,7 @@ public final class SchedulePlanner {
         }
 
         if (canNotify) {
-            todayReservations.stream()
+            uniqueReservations.stream()
                     .skip(1)
                     .forEach(r -> setNotification(
                             context,
