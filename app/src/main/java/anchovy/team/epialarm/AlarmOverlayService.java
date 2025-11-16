@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -112,8 +113,19 @@ public class AlarmOverlayService extends Service {
     private void startAlarm() {
         wakeScreen();
 
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioManager != null) {
+            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    maxVolume,
+                    0
+            );
+        }
+
         player = MediaPlayer.create(this, R.raw.sound_file_1);
         if (player != null) {
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setLooping(true);
             player.start();
         }
