@@ -47,12 +47,10 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
                         (className + "_open").hashCode(),
                         PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                 );
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
-                .setContentText(String.format("%s starts in %d minutes in %s",
-                        className, advance, rooms))
+                .setContentText(context.getString(R.string.starts_in, className, advance, rooms))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)

@@ -98,14 +98,14 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
         searchTeacherButton.setVisibility(visibility);
         currentGroup.setVisibility(visibility);
 
-        loginButton.setText(isLoggedIn ? "Logout" : "Login");
-        connectionStatus.setText(isLoggedIn ? "Connected" : "Not connected");
+        loginButton.setText(isLoggedIn ? R.string.logout : R.string.login);
+        connectionStatus.setText(isLoggedIn ? R.string.connected : R.string.not_connected);
 
         if (isLoggedIn) {
             if ("group".equals(session.getChosenType())) {
-                currentGroup.setText(String.format("Chosen Group: %s", session.getGroupName()));
+                currentGroup.setText(getString(R.string.chosen_group, session.getGroupName()));
             } else if ("teacher".equals(session.getChosenType())) {
-                currentGroup.setText(String.format("Chosen Teacher: %s", session.getTeacherName()));
+                currentGroup.setText(getString(R.string.chosen_teacher, session.getTeacherName()));
             }
         }
     }

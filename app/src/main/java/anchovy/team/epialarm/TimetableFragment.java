@@ -72,9 +72,9 @@ public class TimetableFragment extends Fragment {
             reservationsGrouped = viewModel.groupedReservations;
             loadData();
         } else if (session.getToken() == null) {
-            showMessage("Nothing to see here, you are not authorized");
+            showMessage(getString(R.string.no_token));
         } else if (session.getChosenType() == null) {
-            showMessage("You have to choose a group or a teacher!");
+            showMessage(getString(R.string.no_group));
         } else {
             emptyMessage.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
@@ -104,20 +104,20 @@ public class TimetableFragment extends Fragment {
                 listView.setAdapter(customBaseAdapter);
             }
             if (customBaseAdapter.isEmpty()) {
-                showMessage("No classes found :(");
+                showMessage(getString(R.string.no_classes_found));
             }
         }
     }
 
     public void setReservations(List<Reservation> reservations) {
+        ZoneId parisZone = ZoneId.of("Europe/Paris");
         if (reservations == null) {
-            showMessage("No classes found :(");
+            showMessage(getString(R.string.no_classes_found));
             return;
         }
 
         for (Reservation r : reservations) {
             //System.out.println(r.getName());
-            ZoneId parisZone = ZoneId.of("Europe/Paris");
             ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
                     .withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();
