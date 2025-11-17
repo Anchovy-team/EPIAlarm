@@ -111,12 +111,14 @@ public class ScheduledListFragment extends Fragment {
                         }
 
                         String triggerTime = triggerParis.toLocalTime().format(fmt);
-                        String dayLabel = d.equals(today) ? "Today" : "Tomorrow";
+                        String dayLabel = d.equals(today) ? getString(R.string.today) :
+                                getString(R.string.tomorrow);
 
                         Map<String, String> row = new HashMap<>();
                         row.put("title", r.getName());
                         row.put("time", dayLabel + " • " + triggerTime);
-                        row.put("type", isAlarm ? "Alarm" : "Reminder");
+                        row.put("type", isAlarm ? getString(R.string.alarm) :
+                                getString(R.string.reminder));
                         data.add(row);
                     }
 

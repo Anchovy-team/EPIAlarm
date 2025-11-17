@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">EpiAlarm</string>
+    <string name="app_name" translatable="false">EpiAlarm</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="not_connected">Not connected</string>
     <string name="connected">Connected</string>
-    <string name="disconnect">Disconnect</string>
     <string name="search_group">Search Group</string>
     <string name="search_teacher">Search Teacher</string>
     <string name="login">Login</string>
@@ -14,4 +13,41 @@
     <string name="config_title">Configuration</string>
     <string name="config_description">*How long before the first class do you want to set the alarm?</string>
     <string name="vibrate_label">Vibrate when alarm sounds</string>
+    <string name="overlay_permission">Overlay permission is granted, now you can Save Settings</string>
+    <string name="overlay_denied">Overlay permission is denied, you will not have alarms</string>
+    <string name="notification_permission">"Notification permission is granted, now you can Save Settings"</string>
+    <string name="notification_denied">Notification permission is denied, you will not receive notifications</string>
+    <string name="postpone">POSTPONE</string>
+    <string name="close">CLOSE</string>
+    <string name="alarm_configuration">Alarm Configuration</string>
+    <string name="set_advance">Set advance times before lessons: alarm for the first one, reminder for the rest.</string>
+    <string name="alarm">Alarm</string>
+    <string name="reminder">Reminder</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="view_scheduled_alarms">View Scheduled Alarms</string>
+    <string name="activity_type">Activity type</string>
+    <string name="professor">Professor</string>
+    <string name="classroom">Classroom</string>
+    <string name="group">Group</string>
+    <string name="active_alarms">Active alarms and reminders</string>
+    <string name="preferences_saved">Preferences saved!</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="show_window">To show alarm window, please allow overlay</string>
+    <string name="allow">Allow</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_notification">Notifications can not be sent, because you denied notification request</string>
+    <string name="advance_minutes">In %1$d minutes in %2$s</string>
+    <string name="starts_in">%1$s starts in %2$d minutes in %3$s</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="search_group_hint">Search group…</string>
+    <string name="search_teacher_hint">Search teacher…</string>
+    <string name="logout">Logout</string>
+    <string name="chosen_group">Chosen Group: %1$s</string>
+    <string name="chosen_teacher">Chosen Teacher: %1$s</string>
+    <string name="no_token">Nothing to see here, you are not authorized</string>
+    <string name="no_group">You have to choose a group or a teacher!</string>
+    <string name="no_classes_found">No classes found :(</string>
 </resources>

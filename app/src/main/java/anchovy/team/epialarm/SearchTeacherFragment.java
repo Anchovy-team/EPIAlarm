@@ -34,7 +34,7 @@ public class SearchTeacherFragment extends DialogFragment {
 
         SearchView searchView = view.findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(false);
-        searchView.setQueryHint("Search teacher...");
+        searchView.setQueryHint(getString(R.string.search_teacher_hint));
 
         session = UserSession.getInstance(context);
         TeachersViewModel teachersViewModel = new ViewModelProvider(requireActivity()).get(

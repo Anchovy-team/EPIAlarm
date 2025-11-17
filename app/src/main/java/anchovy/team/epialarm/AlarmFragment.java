@@ -45,22 +45,22 @@ public class AlarmFragment extends Fragment {
                     boolean permissionType = radioAlarm.isChecked();
                         if (isGranted) {
                             if (permissionType) {
-                                Toast.makeText(context, "Overlay permission is granted, "
-                                        + "now you can Save Settings", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context,
+                                        R.string.overlay_permission,
+                                        Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(context, "Notification permission is granted,"
-                                                + " now you can Save Settings",
+                                Toast.makeText(context,
+                                        R.string.notification_permission,
                                         Toast.LENGTH_LONG).show();
                             }
                         } else {
                             if (permissionType) {
                                 Toast.makeText(context,
-                                        "Overlay permission is denied, you will not have alarms",
+                                        R.string.overlay_denied,
                                         Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(context,
-                                        "Notification permission is denied,"
-                                                + " you will not receive notifications",
+                                        R.string.notification_denied,
                                         Toast.LENGTH_LONG).show();
                             }
                         }
@@ -71,9 +71,10 @@ public class AlarmFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1001) {
             if (Settings.canDrawOverlays(context)) {
-                Toast.makeText(context, "Overlay permission granted!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.overlay_permission, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(context, "Overlay permission denied.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,
+                        R.string.notification_permission, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -114,7 +115,7 @@ public class AlarmFragment extends Fragment {
     }
 
     private void onSaveClicked() {
-        Toast.makeText(context, "Preferences saved!", Toast.LENGTH_LONG).show();
+        Toast.makeText(context, R.string.preferences_saved, Toast.LENGTH_LONG).show();
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
         boolean alarmMode = radioAlarm.isChecked();
         if (alarmMode) {
@@ -123,14 +124,14 @@ public class AlarmFragment extends Fragment {
             } else {
 
                 new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AlertDialogTheme))
-                    .setTitle("Permission Required")
-                    .setMessage("To show alarm window, please allow overlay")
-                    .setPositiveButton("Allow", (dialog, which) -> {
+                    .setTitle(R.string.permission_required)
+                    .setMessage(R.string.show_window)
+                    .setPositiveButton(R.string.allow, (dialog, which) -> {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                 Uri.parse("package:anchovy.team.epialarm"));
                         startActivityForResult(intent, 1001);
                     })
-                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .setCancelable(false)
                     .show();
             }
@@ -142,7 +143,7 @@ public class AlarmFragment extends Fragment {
             } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                     requireActivity(), android.Manifest.permission.POST_NOTIFICATIONS)) {
                 Toast.makeText(context,
-                        "Notifications can not be sent, because you denied notification request",
+                        R.string.no_notification,
                         Toast.LENGTH_LONG).show();
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

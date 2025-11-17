@@ -35,7 +35,7 @@ public class SearchGroupFragment extends DialogFragment {
 
         SearchView searchView = view.findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(false);
-        searchView.setQueryHint("Search group...");
+        searchView.setQueryHint(getString(R.string.search_group_hint));
 
         session = UserSession.getInstance(context);
         GroupsViewModel groupsViewModel = new ViewModelProvider(requireActivity()).get(

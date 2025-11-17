@@ -80,7 +80,7 @@ public class AlarmOverlayService extends Service {
 
         ((TextView) overlay.findViewById(R.id.textTitle)).setText(className);
         ((TextView) overlay.findViewById(R.id.textCountdown))
-                .setText(String.format("In %d minutes in %s", advance, rooms));
+                .setText(getString(R.string.advance_minutes, advance, rooms));
 
         overlay.findViewById(R.id.btnClose).setOnClickListener(v -> close(false, null, null));
         overlay.findViewById(R.id.btnPostpone).setOnClickListener(v ->
@@ -162,13 +162,13 @@ public class AlarmOverlayService extends Service {
                         }
                         overlay = null;
                         if (postpone && className != null) {
-                            scheduleSnooze(className, POSTPONE_MIN, rooms);
+                            scheduleSnooze(className, rooms);
                         }
                         stopSelf();
                     }).start();
         } else {
             if (postpone && className != null) {
-                scheduleSnooze(className, POSTPONE_MIN, rooms);
+                scheduleSnooze(className, rooms);
             }
             stopSelf();
         }
@@ -196,19 +196,19 @@ public class AlarmOverlayService extends Service {
         }
     }
 
-    private void scheduleSnooze(String className, int minutes, String rooms) {
-        if (minutes <= 0) {
+    private void scheduleSnooze(String className, String rooms) {
+        if (POSTPONE_MIN <= 0) {
             return;
         }
 
-        long triggerAt = System.currentTimeMillis() + minutes * 60_000L;
+        long triggerAt = System.currentTimeMillis() + POSTPONE_MIN * 60_000L;
         if (triggerAt <= System.currentTimeMillis()) {
             return;
         }
 
         Intent i = new Intent(this, AlarmReceiver.class)
                 .putExtra("className", className)
-                .putExtra("advance", minutes)
+                .putExtra("advance", POSTPONE_MIN)
                 .putExtra("rooms", rooms);
 
         int requestCode = ("snooze_" + className).hashCode();

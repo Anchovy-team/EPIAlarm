@@ -10,7 +10,7 @@
         android:id="@+id/scheduled_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Active alarms and reminders"
+        android:text="@string/active_alarms"
         android:textStyle="bold"
         android:textSize="20sp"
         android:textColor="@color/text_primary"

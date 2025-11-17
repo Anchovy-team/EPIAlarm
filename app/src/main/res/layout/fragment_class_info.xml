@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Activity type"
+            android:text="@string/activity_type"
             android:textSize="16dp"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.EpiAlarm.Title" />
@@ -57,7 +57,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Professor"
+            android:text="@string/professor"
             android:textStyle="bold"
             android:textSize="16dp"
             android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
@@ -72,7 +72,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Classroom"
+            android:text="@string/classroom"
             android:textSize="16dp"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
@@ -87,7 +87,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Group"
+            android:text="@string/group"
             android:textSize="16dp"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.EpiAlarm.Title"
