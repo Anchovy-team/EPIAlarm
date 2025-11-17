@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/settings"
-        android:title="Settings"
+        android:title="@string/settings"
         android:icon="@drawable/settings_24px"
         />
     <item
         android:id="@+id/timetable"
-        android:title="Timetable"
+        android:title="@string/timetable"
         android:icon="@drawable/toc_24px"
         />
     <item
         android:id="@+id/alarm"
-        android:title="Alarm"
+        android:title="@string/alarm"
         android:icon="@drawable/alarm_24px"/>
 
 </menu>

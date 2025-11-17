@@ -49,4 +49,6 @@
     <string name="postpone">REPORTER</string>
     <string name="close">FERMER</string>
     <string name="alarm_configuration">Configuration d\'alarme</string>
+    <string name="settings">Paramètres</string>
+    <string name="timetable">Horaire</string>
 </resources>

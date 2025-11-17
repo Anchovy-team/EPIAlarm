@@ -50,4 +50,6 @@
     <string name="no_token">Nothing to see here, you are not authorized</string>
     <string name="no_group">You have to choose a group or a teacher!</string>
     <string name="no_classes_found">No classes found :(</string>
+    <string name="settings">Settings</string>
+    <string name="timetable">Timetable</string>
 </resources>

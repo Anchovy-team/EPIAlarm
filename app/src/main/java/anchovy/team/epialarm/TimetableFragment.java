@@ -110,6 +110,7 @@ public class TimetableFragment extends Fragment {
     }
 
     public void setReservations(List<Reservation> reservations) {
+        ZoneId parisZone = ZoneId.of("Europe/Paris");
         if (reservations == null) {
             showMessage(getString(R.string.no_classes_found));
             return;
@@ -117,7 +118,6 @@ public class TimetableFragment extends Fragment {
 
         for (Reservation r : reservations) {
             //System.out.println(r.getName());
-            ZoneId parisZone = ZoneId.of("Europe/Paris");
             ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
                     .withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();

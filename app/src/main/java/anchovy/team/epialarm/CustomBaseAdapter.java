@@ -68,7 +68,7 @@ public class CustomBaseAdapter extends BaseAdapter {
             convertView.setFocusable(false);
             DateHeaderItem headerItem = (DateHeaderItem) displayList.get(position);
             TextView headerText = convertView.findViewById(R.id.dateHeaderText);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd/MM", Locale.ENGLISH);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE dd/MM", Locale.getDefault());
             headerText.setText(headerItem.date.format(formatter));
         } else {
             ReservationItem item = (ReservationItem) displayList.get(position);
