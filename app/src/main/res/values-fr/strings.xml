@@ -14,7 +14,7 @@
     <string name="vibrate_label">Vibrer quand une alarme sonne</string>
     <string name="group">Groupe</string>
     <string name="active_alarms">Alarmes et rappels</string>
-    <string name="preferences_saved">Préférences sauvegarder</string>
+    <string name="preferences_saved">Préférences sauvegardées</string>
     <string name="permission_required">Autorisation requise</string>
     <string name="show_window">Pour afficher la fenêtre d’alarme, autorisez le vue en 1er plan</string>
     <string name="allow">Autoriser</string>

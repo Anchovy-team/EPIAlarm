@@ -46,15 +46,6 @@
             android:name=".AlarmReceiver"
             android:exported="true" />
 
-        <receiver
-            android:name=".receiver.DeleteBootCompletedReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name="com.microsoft.identity.client.BrowserTabActivity"
             android:exported="true">
