@@ -3,28 +3,40 @@ permissions:
   contents: read
 
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
-    uses: Anchovy-team/EPIAlarm/blob/main/.github/workflows/android.yml@main
+    uses: ./.github/workflows/android.yml
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     environment: main
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
+      - uses: 'actions/checkout@v4'
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: release-aab
           path: release/
 
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
       - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          serviceAccountJson: ${{ steps.auth.outputs.credentials_file_path }}
           packageName: anchovy.team.epialarm
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal
