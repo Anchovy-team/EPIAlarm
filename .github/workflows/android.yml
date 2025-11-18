@@ -68,6 +68,10 @@ jobs:
         versionCode: ${{ github.run_number }}
 
     - name: Build with Gradle
+      run: ./gradlew build
+
+    - name: Build Bindle
+      if: ${{ job.environment && job.environment.name == 'main' }}
       run: ./gradlew bundleRelease
 
     - name: Upload AAB
