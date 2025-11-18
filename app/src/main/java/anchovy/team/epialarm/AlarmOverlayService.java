@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -62,26 +63,28 @@ public class AlarmOverlayService extends Service {
         }
 
         String className = intent.getStringExtra("className");
+        String rooms = intent.getStringExtra("rooms");
         int advance = intent.getIntExtra("advance", 0);
         if (advance <= 0) {
             stopSelf();
             return START_NOT_STICKY;
         }
 
-        showOverlay(className, advance);
+        showOverlay(className, advance, rooms);
         return START_STICKY;
     }
 
-    private void showOverlay(String className, int advance) {
+    private void showOverlay(String className, int advance, String rooms) {
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         overlay = LayoutInflater.from(this).inflate(R.layout.alarm_overlay, null);
 
         ((TextView) overlay.findViewById(R.id.textTitle)).setText(className);
         ((TextView) overlay.findViewById(R.id.textCountdown))
-                .setText(String.format("In %d minutes", advance));
+                .setText(getString(R.string.advance_minutes, advance, rooms));
 
-        overlay.findViewById(R.id.btnClose).setOnClickListener(v -> close(false, null));
-        overlay.findViewById(R.id.btnPostpone).setOnClickListener(v -> close(true, className));
+        overlay.findViewById(R.id.btnClose).setOnClickListener(v -> close(false, null, null));
+        overlay.findViewById(R.id.btnPostpone).setOnClickListener(v ->
+                close(true, className, rooms));
 
         int flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -110,8 +113,19 @@ public class AlarmOverlayService extends Service {
     private void startAlarm() {
         wakeScreen();
 
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioManager != null) {
+            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    maxVolume,
+                    0
+            );
+        }
+
         player = MediaPlayer.create(this, R.raw.sound_file_1);
         if (player != null) {
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.setLooping(true);
             player.start();
         }
@@ -135,7 +149,7 @@ public class AlarmOverlayService extends Service {
         }
     }
 
-    private void close(boolean postpone, String className) {
+    private void close(boolean postpone, String className, String rooms) {
         stopAlarm();
         if (overlay != null) {
             overlay.animate().alpha(0f).scaleX(0.8f).scaleY(0.8f)
@@ -148,13 +162,13 @@ public class AlarmOverlayService extends Service {
                         }
                         overlay = null;
                         if (postpone && className != null) {
-                            scheduleSnooze(className, POSTPONE_MIN);
+                            scheduleSnooze(className, rooms);
                         }
                         stopSelf();
                     }).start();
         } else {
             if (postpone && className != null) {
-                scheduleSnooze(className, POSTPONE_MIN);
+                scheduleSnooze(className, rooms);
             }
             stopSelf();
         }
@@ -182,19 +196,20 @@ public class AlarmOverlayService extends Service {
         }
     }
 
-    private void scheduleSnooze(String className, int minutes) {
-        if (minutes <= 0) {
+    private void scheduleSnooze(String className, String rooms) {
+        if (POSTPONE_MIN <= 0) {
             return;
         }
 
-        long triggerAt = System.currentTimeMillis() + minutes * 60_000L;
+        long triggerAt = System.currentTimeMillis() + POSTPONE_MIN * 60_000L;
         if (triggerAt <= System.currentTimeMillis()) {
             return;
         }
 
         Intent i = new Intent(this, AlarmReceiver.class)
                 .putExtra("className", className)
-                .putExtra("advance", minutes);
+                .putExtra("advance", POSTPONE_MIN)
+                .putExtra("rooms", rooms);
 
         int requestCode = ("snooze_" + className).hashCode();
 

@@ -2,7 +2,6 @@ package anchovy.team.epialarm;
 
 import anchovy.team.epialarm.utils.NumberPickerHelper;
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +19,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -44,22 +45,22 @@ public class AlarmFragment extends Fragment {
                     boolean permissionType = radioAlarm.isChecked();
                         if (isGranted) {
                             if (permissionType) {
-                                Toast.makeText(context, "Overlay permission is granted, "
-                                        + "now you can Save Settings", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context,
+                                        R.string.overlay_permission,
+                                        Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(context, "Notification permission is granted,"
-                                                + " now you can Save Settings",
+                                Toast.makeText(context,
+                                        R.string.notification_permission,
                                         Toast.LENGTH_LONG).show();
                             }
                         } else {
                             if (permissionType) {
                                 Toast.makeText(context,
-                                        "Overlay permission is denied, you will not have alarms",
+                                        R.string.overlay_denied,
                                         Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(context,
-                                        "Notification permission is denied,"
-                                                + " you will not receive notifications",
+                                        R.string.notification_denied,
                                         Toast.LENGTH_LONG).show();
                             }
                         }
@@ -70,9 +71,10 @@ public class AlarmFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1001) {
             if (Settings.canDrawOverlays(context)) {
-                Toast.makeText(context, "Overlay permission granted!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.overlay_permission, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(context, "Overlay permission denied.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,
+                        R.string.notification_permission, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -113,22 +115,23 @@ public class AlarmFragment extends Fragment {
     }
 
     private void onSaveClicked() {
-        Toast.makeText(context, "Preferences saved!", Toast.LENGTH_LONG).show();
+        Toast.makeText(context, R.string.preferences_saved, Toast.LENGTH_LONG).show();
         int totalMinutes = hourPicker.getValue() * 60 + minutePicker.getValue();
         boolean alarmMode = radioAlarm.isChecked();
         if (alarmMode) {
             if (Settings.canDrawOverlays(context)) {
                 session.setAdvanceMinutesAlarm(totalMinutes);
             } else {
-                new AlertDialog.Builder(context)
-                    .setTitle("Permission Required")
-                    .setMessage("To show alarm window, please allow overlay")
-                    .setPositiveButton("Allow", (dialog, which) -> {
+
+                new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AlertDialogTheme))
+                    .setTitle(R.string.permission_required)
+                    .setMessage(R.string.show_window)
+                    .setPositiveButton(R.string.allow, (dialog, which) -> {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                 Uri.parse("package:anchovy.team.epialarm"));
                         startActivityForResult(intent, 1001);
                     })
-                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                     .setCancelable(false)
                     .show();
             }
@@ -140,7 +143,7 @@ public class AlarmFragment extends Fragment {
             } else if (ActivityCompat.shouldShowRequestPermissionRationale(
                     requireActivity(), android.Manifest.permission.POST_NOTIFICATIONS)) {
                 Toast.makeText(context,
-                        "Notifications can not be sent, because you denied notification request",
+                        R.string.no_notification,
                         Toast.LENGTH_LONG).show();
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

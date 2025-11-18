@@ -3,6 +3,7 @@ package anchovy.team.epialarm;
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Group;
 import anchovy.team.epialarm.zeus.services.GroupsService;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,18 +25,19 @@ public class SearchGroupFragment extends DialogFragment {
     private final List<String> filteredGroups = new ArrayList<>();
     private final ZeusApiClient clientService = new ZeusApiClient();
     private UserSession session;
+    private Context context;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        context = requireContext();
         View view = inflater.inflate(R.layout.fragment_search_group, container, false);
 
         SearchView searchView = view.findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(false);
-        searchView.setQueryHint("Search group...");
+        searchView.setQueryHint(getString(R.string.search_group_hint));
 
-        session = UserSession.getInstance(requireContext());
+        session = UserSession.getInstance(context);
         GroupsViewModel groupsViewModel = new ViewModelProvider(requireActivity()).get(
                 GroupsViewModel.class);
 
@@ -81,8 +83,8 @@ public class SearchGroupFragment extends DialogFragment {
         super.onStart();
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(
-                    (int) (requireContext().getResources().getDisplayMetrics().widthPixels * 0.8),
-                    (int) (requireContext().getResources().getDisplayMetrics().heightPixels * 0.5)
+                    (int) (context.getResources().getDisplayMetrics().widthPixels * 0.8),
+                    (int) (context.getResources().getDisplayMetrics().heightPixels * 0.5)
             );
             getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
@@ -100,7 +102,7 @@ public class SearchGroupFragment extends DialogFragment {
         ListView listView = view.findViewById(R.id.groupListView);
 
         if (adapter == null) {
-            adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1,
+            adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,
                     filteredGroups);
             listView.setAdapter(adapter);
         } else {

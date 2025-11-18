@@ -3,6 +3,8 @@ package anchovy.team.epialarm;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +19,6 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Override
     public void onReceive(Context context, Intent intent) {
-        String className = intent.getStringExtra("className");
         int advance = intent.getIntExtra("advance", 0);
         if (advance <= 0) {
             return;
@@ -34,15 +35,28 @@ public class NotificationsBroadcastReceiver extends BroadcastReceiver {
             nm.createNotificationChannel(channel);
         }
 
+        String className = intent.getStringExtra("className");
+        String rooms = intent.getStringExtra("rooms");
+
+        Intent openAppIntent = new Intent(context, MainActivity.class);
+        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pendingIntent = TaskStackBuilder.create(context)
+                .addNextIntentWithParentStack(openAppIntent)
+                .getPendingIntent(
+                        (className + "_open").hashCode(),
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.alarm_24px)
                 .setContentTitle("Upcoming Class")
-                .setContentText(className + " starts in " + advance + " minutes")
+                .setContentText(context.getString(R.string.starts_in, className, advance, rooms))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentIntent(pendingIntent);
 
         NotificationManagerCompat.from(context).notify(className.hashCode(), builder.build());
     }

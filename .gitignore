@@ -11,3 +11,5 @@ app/src/main/res/raw/auth_config_single_account.json
 app/release/
 *android-keystore
 .secrets
+auth_config_bundle.json
+auth_config_apk.json

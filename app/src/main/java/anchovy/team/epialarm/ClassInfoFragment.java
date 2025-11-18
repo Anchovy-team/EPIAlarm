@@ -1,5 +1,6 @@
 package anchovy.team.epialarm;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +12,13 @@ import androidx.fragment.app.DialogFragment;
 import java.util.Objects;
 
 public class ClassInfoFragment extends DialogFragment {
+    private Context context;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        context = requireContext();
         View v = inflater.inflate(R.layout.fragment_class_info, container, false);
 
         TextView className = v.findViewById(R.id.className);
@@ -48,8 +51,8 @@ public class ClassInfoFragment extends DialogFragment {
         super.onStart();
         if (getDialog() != null && getDialog().getWindow() != null) {
             getDialog().getWindow().setLayout(
-                    (int) (requireContext().getResources().getDisplayMetrics().widthPixels * 0.8),
-                    (int) (requireContext().getResources().getDisplayMetrics().heightPixels * 0.5)
+                    (int) (context.getResources().getDisplayMetrics().widthPixels * 0.8),
+                    (int) (context.getResources().getDisplayMetrics().heightPixels * 0.5)
             );
             getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }

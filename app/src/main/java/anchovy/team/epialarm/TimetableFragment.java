@@ -4,6 +4,7 @@ import anchovy.team.epialarm.zeus.models.Group;
 import anchovy.team.epialarm.zeus.models.Reservation;
 import anchovy.team.epialarm.zeus.models.Room;
 import anchovy.team.epialarm.zeus.models.Teacher;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +35,14 @@ public class TimetableFragment extends Fragment {
     private ListView listView;
     private UserSession session;
     private ScheduleRepository scheduleRepository;
+    private Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        context = requireContext();
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(TimetableViewModel.class);
-        session = UserSession.getInstance(requireContext());
+        session = UserSession.getInstance(context);
         scheduleRepository = ScheduleRepository.getInstance();
     }
 
@@ -69,15 +72,15 @@ public class TimetableFragment extends Fragment {
             reservationsGrouped = viewModel.groupedReservations;
             loadData();
         } else if (session.getToken() == null) {
-            showMessage("Nothing to see here, you are not authorized");
+            showMessage(getString(R.string.no_token));
         } else if (session.getChosenType() == null) {
-            showMessage("You have to choose a group or a teacher!");
+            showMessage(getString(R.string.no_group));
         } else {
             emptyMessage.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
             reservationsGrouped = new TreeMap<>();
 
-            scheduleRepository.fetchReservations(requireContext())
+            scheduleRepository.fetchReservations(context)
                     .thenAccept(res -> requireActivity().runOnUiThread(() -> setReservations(res)))
                     .exceptionally(ex -> {
                         ex.printStackTrace();
@@ -95,26 +98,26 @@ public class TimetableFragment extends Fragment {
 
     public void loadData() {
         if (isAdded() && getContext() != null) {
-            CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(requireContext(),
+            CustomBaseAdapter customBaseAdapter = new CustomBaseAdapter(context,
                     reservationsGrouped);
             if (listView != null) {
                 listView.setAdapter(customBaseAdapter);
             }
             if (customBaseAdapter.isEmpty()) {
-                showMessage("No classes found :(");
+                showMessage(getString(R.string.no_classes_found));
             }
         }
     }
 
     public void setReservations(List<Reservation> reservations) {
+        ZoneId parisZone = ZoneId.of("Europe/Paris");
         if (reservations == null) {
-            showMessage("No classes found :(");
+            showMessage(getString(R.string.no_classes_found));
             return;
         }
 
         for (Reservation r : reservations) {
             //System.out.println(r.getName());
-            ZoneId parisZone = ZoneId.of("Europe/Paris");
             ZonedDateTime parisDateTime = r.getStartDate().atZone(ZoneId.of("UTC"))
                     .withZoneSameInstant(parisZone);
             LocalDate date = parisDateTime.toLocalDate();
