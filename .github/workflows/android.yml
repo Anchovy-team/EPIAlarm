@@ -58,6 +58,7 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "MSAL_HOST=$MSAL_HOST" >> local.properties
           echo "MSAL_PATH=$MSAL_PATH" >> local.properties
+          echo "MSAL_PATH_BUNDLE=$MSAL_PATH" >> local.properties
 
     - name: Version Bump
       if: ${{ job.environment && job.environment.name == 'main' }}
