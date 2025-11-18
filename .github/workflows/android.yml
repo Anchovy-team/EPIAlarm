@@ -58,6 +58,14 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "MSAL_HOST=$MSAL_HOST" >> local.properties
           echo "MSAL_PATH=$MSAL_PATH" >> local.properties
+
+    - name: Version Bump
+      if: ${{ job.environment && job.environment.name == 'main' }}
+      uses: chkfung/android-version-actions@v1.2.3
+      with:
+        gradlePath: app/build.gradle.kts
+        versionCode: ${{ github.run_number }}
+
     - name: Build with Gradle
       run: ./gradlew bundleRelease
 
