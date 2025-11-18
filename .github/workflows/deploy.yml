@@ -1,0 +1,30 @@
+name: Deploy to Google Play
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    uses: Anchovy-team/EPIAlarm/blob/main/.github/workflows/android.yml@main
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-aab
+          path: release/
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: anchovy.team.epialarm
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal

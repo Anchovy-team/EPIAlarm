@@ -4,11 +4,12 @@ permissions:
   
 on:
   pull_request:
-    branches: [ "dev" ]
+    branches: ["main", "dev" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.pull_request.base.ref == 'main' && 'main' || '' }}
     steps:
     - uses: actions/checkout@v4
     - name: set up JDK 17
@@ -17,7 +18,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Set up auth config
@@ -29,7 +29,7 @@ jobs:
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         STRORE_FILE: ${{secrets.STRORE_FILE}}
-      run: echo "$KEYSTORE_BASE64" | base64 --decode > app/debug-key.jks
+      run: echo "$KEYSTORE_BASE64" | base64 --decode > app/key.jks
     - name: Set up keystore Debug
       env:
           KEY_ALIAS: ${{secrets.KEY_ALIAS}}
@@ -39,7 +39,7 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" > keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> keystore.properties
           echo "storePassword=$STORE_PASSWORD" >> keystore.properties
-          echo "storeFile=debug-key.jks" >> keystore.properties
+          echo "storeFile=key.jks" >> keystore.properties
     - name: Set up keystore Release
       env:
         KEY_ALIAS: ${{secrets.KEY_ALIAS}}
@@ -49,7 +49,7 @@ jobs:
         echo "keyAlias=$KEY_ALIAS" > keystore.properties.release
         echo "keyPassword=$KEY_PASSWORD" >> keystore.properties.release
         echo "storePassword=$STORE_PASSWORD" >> keystore.properties.release
-        echo "storeFile=debug-key.jks" >> keystore.properties.release
+        echo "storeFile=key.jks" >> keystore.properties.release
     - name: Set up env
       env:
           MSAL_HOST: ${{secrets.MSAL_HOST}}
@@ -59,4 +59,11 @@ jobs:
           echo "MSAL_HOST=$MSAL_HOST" >> local.properties
           echo "MSAL_PATH=$MSAL_PATH" >> local.properties
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew bundleRelease
+
+    - name: Upload AAB
+      if: ${{ job.environment && job.environment.name == 'main' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-aab
+        path: app/build/outputs/bundle/release/app-release.aab
