@@ -5,6 +5,11 @@ permissions:
 on:
   pull_request:
     branches: ["main", "dev" ]
+  workflow_call:
+    inputs:
+      flavor:
+        required: false
+        type: string
 
 jobs:
   build:
