@@ -27,7 +27,7 @@ jobs:
         env:
           AUTH_CONFIG: ${{secrets.AUTH_CONFIG}}
         run:
-          echo "$AUTH_CONFIG" > app/src/main/res/raw/auth_config_apk.json
+          echo "$AUTH_CONFIG" > app/src/main/res/raw/auth_config_bundle.json
       - name: Decode keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
