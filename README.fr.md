@@ -4,7 +4,6 @@
 
 ## Description
 
-This application allows you to connect using your school account, see your timetable and automatically set up the alarms based on that.
 Cette application vous permet vous connectez en utitilisant votre compte d'école, regardez vos horaires et mettez les alarmes automatiquement sur la base de vos horaires
 
 <img src="screenshots/FR/1.png" alt="login" width="360" height="800">
