@@ -1,4 +1,4 @@
-package anchovy.team.epialarm.zeus.services;
+/*package anchovy.team.epialarm.zeus.services;
 
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.AssignRoom;
@@ -18,11 +18,11 @@ public class RoomService {
     }
     
     public CompletableFuture<List<Room>> getAllRooms() {
-        return apiClient.get("/api/room", new TypeReference<List<Room>>() {});
+        return apiClient.get("/api/room");
     }
     
     public CompletableFuture<Room> getRoomById(Long id) {
-        return apiClient.get("/api/room/" + id, new TypeReference<Room>() {});
+        return apiClient.get("/api/room/" + id);
     }
     
     public CompletableFuture<List<Room>> getRoomsWithPaging(int pageNumber,
@@ -32,12 +32,11 @@ public class RoomService {
         if (name != null && !name.isEmpty()) {
             url += "&Name=" + name;
         }
-        return apiClient.get(url, new TypeReference<List<Room>>() {});
+        return apiClient.get(url);
     }
     
     public CompletableFuture<List<AssignRoom>> getRoomUsage(Long id) {
-        return apiClient.get("/api/room/" + id + "/usedby",
-                new TypeReference<List<AssignRoom>>() {});
+        return apiClient.get("/api/room/" + id + "/usedby");
     }
     
     public CompletableFuture<List<FilterAvailableRoomResponse>>
@@ -56,6 +55,6 @@ public class RoomService {
         if (startDate != null && !startDate.isEmpty()) {
             url += "?startDate=" + startDate;
         }
-        return apiClient.get(url, new TypeReference<byte[]>() {});
+        return apiClient.get(url);
     }
-}
+}*/
