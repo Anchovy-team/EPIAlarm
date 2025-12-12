@@ -92,6 +92,10 @@ public class SettingsFragment extends Fragment implements AuthResultHandler {
     }
 
     private void updateUi() {
+        if (!isAdded() || getView() == null) {
+            return;
+        }
+
         boolean isLoggedIn = session.getToken() != null;
         int visibility = isLoggedIn ? View.VISIBLE : View.GONE;
         searchGroupButton.setVisibility(visibility);
