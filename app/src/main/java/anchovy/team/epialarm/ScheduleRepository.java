@@ -17,8 +17,8 @@ public class ScheduleRepository {
     private final ReservationService reservationService;
 
     private ScheduleRepository() {
-        apiClient = new ZeusApiClient();
-        reservationService = new ReservationService(apiClient);
+        apiClient = ZeusApiClient.getZeusApiClientInstance();
+        reservationService = new ReservationService();
     }
 
     public static synchronized ScheduleRepository getInstance() {
@@ -46,13 +46,9 @@ public class ScheduleRepository {
         LocalDateTime to = LocalDateTime.now().plusWeeks(4);
 
         if ("group".equals(session.getChosenType())) {
-            List<Long> groups = List.of(session.getGroupId());
-            return reservationService.getReservationsByFilter(groups, List.of(), List.of(), from,
-                    to);
+            return reservationService.getReservationsByGroup(session.getGroupId(), from, to);
         } else if ("teacher".equals(session.getChosenType())) {
-            List<Long> teachers = List.of(session.getTeacherId());
-            return reservationService.getReservationsByFilter(List.of(), List.of(), teachers, from,
-                    to);
+            return reservationService.getReservationsByTeacher(session.getTeacherId(), from, to);
         }
 
         return CompletableFuture.completedFuture(new ArrayList<>());

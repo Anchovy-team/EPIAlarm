@@ -24,7 +24,13 @@ public class ZeusApiClient {
     private String authToken;
     private final ObjectMapper objectMapper;
 
-    public ZeusApiClient() {
+    private static final ZeusApiClient zeusApiClientInstance = new ZeusApiClient();
+
+    public static ZeusApiClient getZeusApiClientInstance() {
+        return zeusApiClientInstance;
+    }
+
+    private ZeusApiClient() {
         this.baseUrl = "https://zeus.ionis-it.com";
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -44,7 +50,7 @@ public class ZeusApiClient {
                 });
     }
 
-    public <T> CompletableFuture<T> get(String path, TypeReference<T> responseType) {
+    public <T> CompletableFuture<T> get(String path,  TypeReference<T> typeRef) {
         Request request = new Request.Builder()
                 .url(baseUrl + path)
                 .header("Accept", "application/json")
@@ -71,7 +77,7 @@ public class ZeusApiClient {
 
                     String body = res.body() != null ? res.body().string() : "";
                     try {
-                        T result = objectMapper.readValue(body, responseType);
+                        T result = objectMapper.readValue(body, typeRef);
                         future.complete(result);
                     } catch (JsonProcessingException e) {
                         future.completeExceptionally(

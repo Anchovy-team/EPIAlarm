@@ -1,5 +1,7 @@
 package anchovy.team.epialarm.zeus.models;
 
+import androidx.annotation.NonNull;
+
 public class Group {
     private int id;
     private int idParent;
@@ -101,6 +103,7 @@ public class Group {
     public Group() {
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Group{"

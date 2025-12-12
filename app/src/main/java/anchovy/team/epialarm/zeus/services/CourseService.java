@@ -1,4 +1,4 @@
-package anchovy.team.epialarm.zeus.services;
+/*package anchovy.team.epialarm.zeus.services;
 
 import anchovy.team.epialarm.zeus.client.ZeusApiClient;
 import anchovy.team.epialarm.zeus.models.Course;
@@ -15,21 +15,19 @@ public class CourseService {
     }
     
     public CompletableFuture<List<Course>> getAllCourses() {
-        return apiClient.get("/api/course", new TypeReference<List<Course>>() {});
+        return apiClient.get("/api/course");
     }
     
     public CompletableFuture<Course> getCourseById(Long id) {
-        return apiClient.get("/api/course/" + id, new TypeReference<Course>() {});
+        return apiClient.get("/api/course/" + id);
     }
     
     public CompletableFuture<List<Reservation>> getCourseUsage(Long id) {
-        return apiClient.get("/api/course/" + id + "/usedby",
-                new TypeReference<List<Reservation>>() {});
+        return apiClient.get("/api/course/" + id + "/usedby");
     }
     
     public CompletableFuture<List<Course>> getCoursesByTeacher(int teacherId) {
-        return apiClient.get("/api/course/teacher/" + teacherId,
-                new TypeReference<List<Course>>() {});
+        return apiClient.get("/api/course/teacher/" + teacherId);
     }
     
     public CompletableFuture<List<Course>> getCoursesWithPaging(int pageNumber, int pageSize,
@@ -43,3 +41,4 @@ public class CourseService {
         return apiClient.post(url, groups, new TypeReference<List<Course>>() {});
     }
 }
+*/
