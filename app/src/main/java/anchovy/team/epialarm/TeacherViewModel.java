@@ -1,9 +1,9 @@
 package anchovy.team.epialarm;
 
-import java.util.List;
 import anchovy.team.epialarm.zeus.models.Teacher;
+import java.util.List;
 
-public class TeacherViewModel extends AbstractViewModel<Teacher>{
+public class TeacherViewModel extends AbstractViewModel<Teacher> {
     @Override
     public List<Teacher> getCachedItems() {
         return cachedItems;
