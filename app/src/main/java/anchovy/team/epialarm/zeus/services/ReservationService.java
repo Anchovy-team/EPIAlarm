@@ -1,30 +1,20 @@
 package anchovy.team.epialarm.zeus.services;
 
-import anchovy.team.epialarm.zeus.client.ZeusApiClient;
-import anchovy.team.epialarm.zeus.models.DetailledReservationInfos;
-import anchovy.team.epialarm.zeus.models.FilterReservations;
 import anchovy.team.epialarm.zeus.models.Reservation;
-import anchovy.team.epialarm.zeus.models.ReservationInfosToDisplay;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 
-public class ReservationService {
-    private final ZeusApiClient apiClient;
-    
-    public ReservationService(ZeusApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
-    
+public class ReservationService extends AbstractService<Reservation> {
+    /*
     public CompletableFuture<Reservation> getReservationById(Long id) {
-        return apiClient.get("/api/reservation/" + id, new TypeReference<Reservation>() {});
+        return apiClient.get("/api/reservation/" + id);
     }
     
     public CompletableFuture<DetailledReservationInfos> getReservationDetails(Long id) {
-        return apiClient.get("/api/reservation/" + id + "/details",
-                new TypeReference<DetailledReservationInfos>() {});
+        return apiClient.get("/api/reservation/" + id + "/details");
     }
     
     public CompletableFuture<List<ReservationInfosToDisplay>> getReservationsByFilter(
@@ -32,8 +22,8 @@ public class ReservationService {
         return apiClient.post("/api/reservation/filter/displayable", filter,
                 new TypeReference<List<ReservationInfosToDisplay>>() {});
     }
-    
-    public CompletableFuture<List<Reservation>> getReservationsByFilter(
+    */
+    /*public CompletableFuture<List<Reservation>> getReservationsByFilter(
             List<Long> groups, List<Long> rooms, List<Long> teachers, 
             LocalDateTime startDate, LocalDateTime endDate) {
         
@@ -58,9 +48,32 @@ public class ReservationService {
             }
         }
         
+        return apiClient.get(url);
+    }*/
+
+    public CompletableFuture<List<Reservation>> getReservationsByTeacher(Long teacherId,
+            LocalDateTime startDate, LocalDateTime endDate) {
+
+        String url = "/api/reservation/filter/displayable?StartDate=" + startDate + "&EndDate="
+                + endDate;
+        url += "&Teachers=" + teacherId;
         return apiClient.get(url, new TypeReference<List<Reservation>>() {});
     }
+
+    public CompletableFuture<List<Reservation>> getReservationsByGroup(Long groupId,
+            LocalDateTime startDate, LocalDateTime endDate) {
+        String url = "/api/reservation/filter/displayable?StartDate=" + startDate + "&EndDate="
+                + endDate;
+        url += "&Groups=" + groupId;
+        return apiClient.get(url, new TypeReference<List<Reservation>>() {});
+    }
+
+    @Override
+    public CompletableFuture<List<Reservation>> getAllItems() {
+        return null;
+    }
     
+    /*
     public CompletableFuture<List<ReservationInfosToDisplay>> getReservationsWithPaging(
             int pageNumber, int pageSize, String name, LocalDateTime startDate,
             LocalDateTime endDate) {
@@ -80,6 +93,7 @@ public class ReservationService {
             url += "&EndDate=" + endDate;
         }
         
-        return apiClient.get(url, new TypeReference<List<ReservationInfosToDisplay>>() {});
+        return apiClient.get(url);
     }
+    */
 }
