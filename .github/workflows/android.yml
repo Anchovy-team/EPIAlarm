@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.pull_request.base.ref == 'main' && 'main' || '' }}
+    # environment: ${{ github.event.pull_request.base.ref == 'main' && 'main' || '' }}
     steps:
     - uses: actions/checkout@v4
     - name: set up JDK 17
